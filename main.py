@@ -186,7 +186,7 @@ def build_input_item_fragment(item, workspace_id=None):
                     UkIcon("mic", height=14, width=14, cls="mr-2"),
                     "Transcribe Audio",
                     hx_post=f"/transcribe-audio/{item.id}",
-                    hx_target="closest article",
+                    hx_target=f"#input-article-{item.id}",
                     hx_swap="outerHTML",
                     cls=(ButtonT.primary, "mb-4")
                 )
@@ -305,7 +305,7 @@ def build_input_item_fragment(item, workspace_id=None):
                 *content_sections
             )
         ),
-        cls=(CardT.default, "mb-4"),
+        cls=(CardT.default, "mb-4", "input-item-article"),
         id=f"input-article-{item.id}"
     )
 
@@ -472,7 +472,7 @@ def index(session):
         NavBar(
             DivRAligned(
                 Span(f"Welcome, {user.username}", cls="mr-4 hidden sm:inline"),
-                Button("Logout", href="/logout", cls=ButtonT.ghost),
+                A("Logout", href="/logout", role="button", cls=ButtonT.ghost),
             ),
             brand=H3("Maintenance Report Generator")
         ),
@@ -490,7 +490,7 @@ def index(session):
                 _="on click add .hidden to #sidebar then add .hidden to me"
             ),
             cls="flex min-h-screen relative"
-        )
+        ),
     )
 
 @rt
@@ -741,7 +741,7 @@ async def upload_file(request, session):
     updated_ingested_items = Div(
         *items_content if items_content else [P("No items added yet.", cls=(TextPresets.muted_sm, "italic"))],
         id="ingested-items",
-        _="on htmx:afterSwap if .input-item-article in me then remove @disabled from #generate-btn else add @disabled to #generate-btn",
+        _="on load or htmx:afterSwap if .input-item-article in me then remove @disabled from #generate-btn else add @disabled to #generate-btn",
         hx_swap_oob="true"
     )
     
@@ -1057,8 +1057,8 @@ def content_workspace(session, workspace_id: str = None):
                     hx_encoding="multipart/form-data",
                     hx_post="/upload",
                     hx_target="#ingested-items",
-                    hx_swap="afterbegin",
-                    _="on htmx:xhr:progress(loaded, total) set #upload-progress.value to (loaded/total)*100"
+                    hx_swap="outerHTML",
+                    _="on htmx:xhr:progress(loaded, total) set #upload-progress.value to (loaded/total)*100 on htmx:configRequest(detail) if #current-workspace-id then set detail.parameters.workspace_id to #current-workspace-id.value end"
                 )(
                     UploadZone(
                         DivVStacked(
@@ -1526,12 +1526,16 @@ def modal_detect_entity(item_id: str, session):
             return Alert("Not an image file", cls=AlertT.error)
         
         return Modal(
-            FormLabel(f"Image: {item.original_filename}"),
-            FormLabel("Entity to detect:", cls="mt-4"),
-            Input(
-                type="text",
-                name="entity_type",
-                placeholder="e.g., person, car, face, door, window...",
+            Form(
+                FormLabel(f"Image: {item.original_filename}"),
+                FormLabel("Entity to detect:", cls="mt-4"),
+                Input(
+                    type="text",
+                    name="entity_type",
+                    placeholder="e.g., person, car, face, door, window...",
+                    id="entity_type_input"
+                ),
+                id="detect-entity-form"
             ),
             header=H3("Detect Entity in Image"),
             footer=Div(
@@ -1540,7 +1544,7 @@ def modal_detect_entity(item_id: str, session):
                     hx_post=f"/detect-entity/{item_id}",
                     hx_target="#modal-container",
                     hx_swap="innerHTML",
-                    hx_include="closest div",
+                    hx_include="#detect-entity-form",
                     cls=ButtonT.primary
                 ),
                 ModalCloseButton(
@@ -1583,102 +1587,105 @@ async def detect_entity_in_image(item_id: str, session, entity_type: str):
         result = await detect_entities_in_image(item.file_path, entity_type.strip())
         
         if "error" in result:
-            return Div(
-                H3("Entity Detection Failed"),
+            return Modal(
                 P(result["error"]),
-                Button(
-                    "Try Again",
-                    hx_get=f"/modal/detect-entity/{item_id}",
-                    hx_target="#modal-container",
-                    hx_swap="innerHTML",
+                header=H3("Entity Detection Failed"),
+                footer=Div(
+                    Button(
+                        "Try Again",
+                        hx_get=f"/modal/detect-entity/{item_id}",
+                        hx_target="#modal-container",
+                        cls=ButtonT.primary
+                    ),
+                    ModalCloseButton(
+                        "Cancel",
+                        hx_get="/modal/close",
+                        hx_target="#modal-container",
+                        htmx=True,
+                        cls=ButtonT.secondary
+                    ),
+                    cls="flex gap-2 justify-end"
                 ),
+                open=True
             )
         
         # Show results
         if result["count"] == 0:
-            return Div(
-                H3("No Entities Found"),
+            return Modal(
                 P(result["message"]),
-                Button(
-                    "Try Different Entity",
-                    hx_get=f"/modal/detect-entity/{item_id}",
-                    hx_target="#modal-container", 
-                    hx_swap="innerHTML",
+                header=H3("No Entities Found"),
+                footer=Div(
+                    Button(
+                        "Try Different Entity",
+                        hx_get=f"/modal/detect-entity/{item_id}",
+                        hx_target="#modal-container",
+                        cls=ButtonT.primary
+                    ),
+                    ModalCloseButton(
+                        "Close",
+                        hx_get="/modal/close",
+                        hx_target="#modal-container",
+                        htmx=True,
+                        cls=ButtonT.secondary
+                    ),
+                    cls="flex gap-2 justify-end"
                 ),
-                Button(
-                    "Close",
-                    hx_get="/modal/close",
-                    hx_target="#modal-container",
-                    hx_swap="innerHTML",
-                ),
+                open=True
             )
         else:
             # Show results within modal structure
-            return Div(
-                # Modal backdrop
+            return Modal(
                 Div(
-                    # Modal content
-                    Div(
-                        Div(
-                            H3("Entities Detected!"),
-                            Button(
-                                "×",
-                                hx_get="/modal/close",
-                                hx_target="#modal-container",
-                                hx_swap="innerHTML",
-                            ),
-                        ),
-                        Div(
-                            P(f"{result['message']} - Preview with bounding boxes:"),
-                            
-                            # Image preview with bounding boxes
-                            Div(
-                                Img(
-                                    src=f"uploads/images/{Path(result['preview_path']).name}",
-                                    alt="Preview with detected entities",
-                                    cls="max-w-full max-h-72 border-2 border-border rounded-lg mb-4"
-                                ),
-                            ),
-                            
-                            # Detection details
-                            Div(
-                                Strong("Detection Details:"),
-                                Ul(
-                                    *[Li(f"{result['entity_type'].title()} {det['index']}: Bounding box at ({det['pixel_coords']['x_min']}, {det['pixel_coords']['y_min']}) to ({det['pixel_coords']['x_max']}, {det['pixel_coords']['y_max']})") 
-                                      for det in result["detections"]],
-                                ),
-                            ),
-                            
-                            P("Do you want to keep these bounding boxes on your image?"),
-                            
-                            # Accept/Reject buttons
-                            Div(
-                                Button(
-                                    "✓ Accept",
-                                    hx_post=f"/accept-entity-detection/{item_id}",
-                                    hx_target="#modal-container",
-                                    hx_swap="innerHTML",
-                                    hx_vals=f'{{"preview_path": "{result["preview_path"]}", "original_path": "{result["original_path"]}"}}',
-                                ),
-                                Button(
-                                    "✗ Reject", 
-                                    hx_post=f"/reject-entity-detection/{item_id}",
-                                    hx_target="#modal-container",
-                                    hx_swap="innerHTML",
-                                    hx_vals=f'{{"preview_path": "{result["preview_path"]}"}}',
-                                ),
-                                Button(
-                                    "Detect Different Entity",
-                                    hx_get=f"/modal/detect-entity/{item_id}",
-                                    hx_target="#modal-container",
-                                    hx_swap="innerHTML",
-                                ),
-                            ),
+                    P(f"{result['message']} - Preview with bounding boxes:"),
+                    
+                    # Image preview with bounding boxes
+                    Center(
+                        Img(
+                            src=f"uploads/images/{Path(result['preview_path']).name}",
+                            alt="Preview with detected entities",
+                            cls="max-w-full max-h-72 border-2 border-border rounded-lg mb-4"
                         ),
                     ),
-                    _="on click if event.target == me then trigger click on the first button in #modal-container end"
+                    
+                    # Detection details
+                    Div(
+                        Strong("Detection Details:"),
+                        Ul(
+                            *[Li(f"{result['entity_type'].title()} {det['index']}: Bounding box at ({det['pixel_coords']['x_min']}, {det['pixel_coords']['y_min']}) to ({det['pixel_coords']['x_max']}, {det['pixel_coords']['y_max']})") 
+                              for det in result["detections"]],
+                            cls="text-sm"
+                        ),
+                        cls="mb-4"
+                    ),
+                    
+                    P("Do you want to keep these bounding boxes on your image?", cls="font-semibold"),
                 ),
-                id="modal-detect-entity-results"
+                header=H3("Entities Detected!"),
+                footer=Div(
+                    Button(
+                        "✓ Accept",
+                        hx_post=f"/accept-entity-detection/{item_id}",
+                        hx_target="#modal-container",
+                        hx_vals=f'{{"preview_path": "{result["preview_path"]}", "original_path": "{result["original_path"]}"}}',
+                        cls=ButtonT.primary
+                    ),
+                    Button(
+                        "✗ Reject", 
+                        hx_post=f"/reject-entity-detection/{item_id}",
+                        hx_target="#modal-container",
+                        hx_vals=f'{{"preview_path": "{result["preview_path"]}"}}',
+                        cls=ButtonT.destructive
+                    ),
+                    Button(
+                        "Detect Different Entity",
+                        hx_get=f"/modal/detect-entity/{item_id}",
+                        hx_target="#modal-container",
+                        cls=ButtonT.secondary
+                    ),
+                    cls="flex gap-2 justify-end"
+                ),
+                open=True,
+                dialog_cls="max-w-3xl"
             )
         
     except Exception as e:
@@ -1898,7 +1905,7 @@ def add_item_to_workspace(workspace_id: str, item_id: str, session):
         updated_ingested_items = Div(
             *items_content if items_content else [P("No items added yet.")],
             id="ingested-items",
-            _="on htmx:afterSwap if .input-item-article in me then remove @disabled from #generate-btn else add @disabled to #generate-btn",
+            _="on load or htmx:afterSwap if .input-item-article in me then remove @disabled from #generate-btn else add @disabled to #generate-btn",
             hx_swap_oob="true"
         )
         
@@ -2452,7 +2459,18 @@ def content_view_input(input_id: str, session):
         image_section = None
         if input_item.file_type == "image":
             image_section = Card(
-                CardHeader(H4("Image Preview")), 
+                CardHeader(
+                    DivFullySpaced(
+                        H4("Image Preview"),
+                        Button(
+                            UkIcon("search", height=16, width=16, cls="mr-2"),
+                            "Detect Entity",
+                            hx_get=f"/modal/detect-entity/{input_item.id}",
+                            hx_target="#modal-container",
+                            cls=ButtonT.secondary
+                        )
+                    )
+                ), 
                 CardBody(
                     Center(
                         Img(
@@ -3053,7 +3071,7 @@ def remove_from_workspace(workspace_id: str, input_id: str, session):
         updated_ingested_items = Div(
             *items_content if items_content else [P("No items added yet.", cls=(TextPresets.muted_sm, "italic"))],
             id="ingested-items",
-            _="on htmx:afterSwap if .input-item-article in me then remove @disabled from #generate-btn else add @disabled to #generate-btn",
+            _="on load or htmx:afterSwap if .input-item-article in me then remove @disabled from #generate-btn else add @disabled to #generate-btn",
             hx_swap_oob="true"
         )
         
