@@ -1,0 +1,13 @@
+graph LR
+    subgraph UIPattern["UI Update Pattern"]
+        Action[User Action]
+        Route[Route Handler]
+        Fragment[build_input_item_fragment]
+        OOB[OOB Swap Updates]
+        Multi[Multiple Views Updated]
+    end
+    
+    Action --> Route
+    Route --> Fragment
+    Fragment --> OOB
+    OOB --> Multi

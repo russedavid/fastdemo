@@ -1,0 +1,54 @@
+erDiagram
+    User ||--o{ Workspace : creates
+    User ||--o{ InputItem : uploads
+    User ||--o{ MaintenanceReport : generates
+    Workspace ||--o{ InputItem : contains
+    Workspace ||--o{ MaintenanceReport : generates
+    MaintenanceReport ||--o{ ReportAnnotation : has
+    
+    User {
+        int id PK
+        string username
+        string email
+        string password_hash
+        datetime created_at
+    }
+    
+    Workspace {
+        int id PK
+        int user_id FK
+        string name
+        string description
+        datetime created_at
+    }
+    
+    InputItem {
+        int id PK
+        int user_id FK
+        int workspace_id FK
+        string file_type
+        string file_path
+        string original_filename
+        string transcription
+        float file_size
+        datetime uploaded_at
+    }
+    
+    MaintenanceReport {
+        int id PK
+        int user_id FK
+        int workspace_id FK
+        string title
+        text content
+        string status
+        string priority
+        datetime created_at
+    }
+    
+    ReportAnnotation {
+        int id PK
+        int report_id FK
+        string annotation_type
+        text content
+        datetime created_at
+    }

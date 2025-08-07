@@ -1,0 +1,28 @@
+sequenceDiagram
+    participant User
+    participant Browser
+    participant FastHTML
+    participant AI_Service
+    participant Database
+    participant FileSystem
+    
+    User->>Browser: Upload File
+    Browser->>FastHTML: POST /upload
+    FastHTML->>FileSystem: Save File
+    FastHTML->>Database: Create InputItem
+    
+    alt Audio File
+        FastHTML->>AI_Service: Transcribe Audio
+        AI_Service->>FastHTML: Return Transcription
+        FastHTML->>Database: Update InputItem
+    end
+    
+    FastHTML->>Browser: Return Updated UI (OOB Swap)
+    
+    User->>Browser: Generate Report
+    Browser->>FastHTML: POST /generate-report
+    FastHTML->>Database: Get Workspace Items
+    FastHTML->>AI_Service: Generate Report (GPT-3.5)
+    AI_Service->>FastHTML: Return Report
+    FastHTML->>Database: Save Report
+    FastHTML->>Browser: Display Report

@@ -1,0 +1,72 @@
+graph TB
+    subgraph ClientLayer["Client Layer"]
+        Browser[Web Browser]
+        HTMX[HTMX/Hyperscript]
+    end
+    
+    subgraph FastHTMLApp["FastHTML Application"]
+        Routes["Route Handlers<br/>main.py"]
+        
+        subgraph Components["Components"]
+            Dashboard[Dashboard Components]
+            Workspaces[Workspace Views]
+            Reports[Report Views]
+            Modals[Modal System]
+        end
+        
+        subgraph Services["Services"]
+            AI["AI Services<br/>ai_services.py"]
+            Utils["Utilities<br/>utils.py"]
+            CSS["Styles<br/>css.py"]
+        end
+        
+        subgraph DataLayer["Data Layer"]
+            Models["Data Models<br/>models.py"]
+            FastLite[FastLite ORM]
+        end
+    end
+    
+    subgraph ExternalServices["External Services"]
+        OpenAI[OpenAI API]
+        Whisper["Whisper API<br/>Audio Transcription"]
+        GPT["GPT-3.5-turbo<br/>Text Generation"]
+    end
+    
+    subgraph Storage["Storage"]
+        SQLite[("SQLite DB<br/>data/frontline.db")]
+        FileSystem["File System<br/>uploads/"]
+        
+        subgraph UploadDirs["Upload Dirs"]
+            Audio[audio/]
+            Images[images/]
+            Text[text/]
+        end
+    end
+    
+    Browser -->|HTTP/WebSockets| Routes
+    HTMX -->|AJAX| Routes
+    
+    Routes --> Dashboard
+    Routes --> Workspaces
+    Routes --> Reports
+    Routes --> Modals
+    
+    Dashboard --> Models
+    Workspaces --> Models
+    Reports --> Models
+    
+    Models --> FastLite
+    FastLite --> SQLite
+    
+    Routes --> AI
+    AI --> OpenAI
+    OpenAI --> Whisper
+    OpenAI --> GPT
+    
+    Routes --> Utils
+    Routes --> CSS
+    
+    Routes --> FileSystem
+    FileSystem --> Audio
+    FileSystem --> Images
+    FileSystem --> Text
