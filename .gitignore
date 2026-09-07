@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+.tools/
+.DS_Store
+.ipynb_checkpoints/
+.sesskey
+.env
+.env.*
+!.env.example
+/uploads/
+/data/*.db
+/data/*.db-*
+/evals/runs/

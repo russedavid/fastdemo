@@ -4,3 +4,4 @@ httpx
 aiofiles
 moondream
 pillow
+pydantic>=2,<3

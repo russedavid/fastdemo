@@ -126,6 +126,18 @@ A lightweight FastHTML application that transforms unstructured frontline inputs
 - Advanced photo annotation tools
 - Real-time notifications
 
+## Evidence-backed reporting component
+
+The new [report component](docs/report-contract.md) separates observations, completed work, proposed actions, and unknown or disputed values, with source references and validation. It is available through a local evaluation runner; the app's existing database and UI have not yet been migrated to this report shape.
+
+Run its offline tests from the repository root:
+
+```sh
+uv run --project evals python -m unittest discover -s tests -p 'test_*.py' -v
+```
+
+See [evaluation instructions and synthetic cases](evals/README.md) for preparation and local model runs.
+
 ## Future Enhancements
 - Photo annotation with bounding boxes
 - Advanced analytics and trend analysis
