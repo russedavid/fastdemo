@@ -29,7 +29,7 @@ A lightweight FastHTML application that transforms unstructured frontline inputs
 ## Getting Started
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.11+
 - OpenAI API key
 
 ### Installation
@@ -51,6 +51,8 @@ A lightweight FastHTML application that transforms unstructured frontline inputs
    ```
 
 5. Open your browser to `http://localhost:5001`
+
+The UI uses HTMX 4.0.0 through FastHTML's native `htmx4` support, FastHTML 0.14.13, FastLite 0.2.4, and MonsterUI 1.0.47. The theme is a fixed light palette with beige surfaces and brown accents. See [UI migration notes](docs/ui-migration.md) for version choices and compatibility changes.
 
 ### First Steps
 1. Register a new account or login
@@ -137,6 +139,8 @@ uv run --project evals python -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
 See [evaluation instructions and synthetic cases](evals/README.md) for preparation and local model runs.
+
+With the application dependencies installed, the same unittest command also runs isolated registration, upload/edit, and page-loading smoke checks. Without those dependencies, the three app-stack checks are explicitly skipped.
 
 ## Future Enhancements
 - Photo annotation with bounding boxes

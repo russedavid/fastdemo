@@ -41,10 +41,10 @@ class MaintenanceReport:
     corrective_action: str
     parts_used: str  # JSON array as string
     next_service_date: str
-    priority: str = "medium"  # low, medium, high, critical
-    status: str = "open"  # open, in_progress, completed, closed
     created_at: str
     updated_at: str
+    priority: str = "medium"  # low, medium, high, critical
+    status: str = "open"  # open, in_progress, completed, closed
     finalized: bool = False
 
 class ReportAnnotation:

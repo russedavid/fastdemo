@@ -9,6 +9,7 @@ from models import *
 from utils import *
 from monsterui.all import *
 from css import css
+from starlette.staticfiles import StaticFiles
 
 # Create necessary directories
 upload_dir = Path("uploads")
@@ -58,7 +59,7 @@ def create_recent_reports_section(user_id: int, swap_oob: bool = False):
             ]
         ),
         id="recent-reports",
-        hx_swap_oob="true" if swap_oob else "false",
+        hx_swap_oob="true" if swap_oob else None,
     )
 
 
@@ -74,7 +75,7 @@ def create_dashboard_stats_section(user_id: int, swap_oob: bool = False):
         hx_target="#main-content",
         cls="p-3 mb-2 rounded-md cursor-pointer transition-colors hover:bg-secondary border border-transparent",
         id="dashboard-stats",
-        hx_swap_oob="true" if swap_oob else "false",
+        hx_swap_oob="true" if swap_oob else None,
     )
 
 
@@ -109,7 +110,7 @@ def create_recent_uploads_section(user_id: int, swap_oob: bool = False):
             ]
         ),
         id="recent-uploads",
-        hx_swap_oob="true" if swap_oob else "false",
+        hx_swap_oob="true" if swap_oob else None,
     )
 
 
@@ -144,7 +145,7 @@ def create_recent_workspaces_section(user_id: int, swap_oob: bool = False):
             ]
         ),
         id="recent-workspaces",
-        hx_swap_oob="true" if swap_oob else "false",
+        hx_swap_oob="true" if swap_oob else None,
     )
 
 
@@ -218,7 +219,7 @@ def build_input_item_fragment(item, workspace_id=None):
         content_sections.append(
             Center(
                 Img(
-                    src=f"uploads/images/{Path(item.file_path).name}",
+                    src=f"/uploads/images/{Path(item.file_path).name}",
                     alt=f"Preview of {item.original_filename}",
                     cls="max-w-32 max-h-24 rounded object-cover shadow-sm"
                 ),
@@ -272,8 +273,8 @@ def build_input_item_fragment(item, workspace_id=None):
             Button(
                 UkIcon("trash-2", height=14, width=14),
                 hx_delete=f"/delete-input/{item.id}",
-                hx_target=f"#input-article-{item.id}",
-                hx_swap="outerHTML",
+                hx_target="#main-content",
+                hx_swap="innerHTML",
                 hx_confirm="Are you sure you want to permanently delete this input item?",
                 cls=(ButtonT.ghost, "text-destructive hover:text-destructive text-xs p-1"),
                 title="Delete permanently"
@@ -305,6 +306,7 @@ def build_input_item_fragment(item, workspace_id=None):
                 *content_sections
             )
         ),
+        body_cls="p-0",
         cls=(CardT.default, "mb-4", "input-item-article"),
         id=f"input-article-{item.id}"
     )
@@ -355,12 +357,14 @@ def create_sidebar(user):
                     cls="space-y-2"
                 )
             ),
+            body_cls="p-0",
             cls=(CardT.default, "mb-6")
         ),
         # Recent Reports
         Card(
             CardHeader(H4("Recent Reports")),
             CardBody(create_recent_reports_section(user.id)),
+            body_cls="p-0",
             cls=(CardT.default, "mb-6")
         ),
         
@@ -368,6 +372,7 @@ def create_sidebar(user):
         Card(
             CardHeader(H4("Recent Uploads")),
             CardBody(create_recent_uploads_section(user.id)),
+            body_cls="p-0",
             cls=(CardT.default, "mb-6")
         ),
         
@@ -375,6 +380,7 @@ def create_sidebar(user):
         Card(
             CardHeader(H4("Recent Workspaces")),
             CardBody(create_recent_workspaces_section(user.id)),
+            body_cls="p-0",
             cls=(CardT.default, "mb-6")
         ),
         
@@ -382,6 +388,7 @@ def create_sidebar(user):
         Card(
             CardHeader(H4("Dashboard")),
             CardBody(create_dashboard_stats_section(user.id)),
+            body_cls="p-0",
             cls=(CardT.default, "mb-6")
         ),
         cls="bg-muted border-r border-border p-4 overflow-y-auto max-w-xs md:block hidden md:relative absolute top-0 left-0 h-full z-40",
@@ -422,16 +429,20 @@ bware = Beforeware(
     skip=[r"/login", r"/send_login", r"/register", r"/", r"/register-user", r"/static"],
 )
 
-hdrs = Theme.blue.headers()
+hdrs = Theme.stone.headers(mode="light", radii=ThemeRadii.lg)
 hdrs.append(Script(src="https://unpkg.com/hyperscript.org@0.9.14"))
 hdrs.append(Style(css))
+hdrs.append(Script(src="/static/app.js", defer=True))
 
 app = FastHTML(
     before=bware,
     hdrs=hdrs,
     pico=False,
+    htmx4=True,
+    htmlkw={"lang": "en", "class": "frontline-theme", "data-theme": "light"},
     secret_key="your-secret-key-change-in-production",
 )
+app.mount("/static", StaticFiles(directory=Path(__file__).resolve().parent / "static"))
 rt = app.route
 
 # Serve uploaded files
@@ -591,18 +602,16 @@ def post(username: str, email: str, password: str, session):
             )
 
         # Create new user
-        user_id = users.insert(
-            User(
-                username=username,
-                email=email,
-                password_hash=hash_password(password),
-                created_at=get_current_timestamp(),
-                active=True,
-            )
-        )
+        new_user = users.insert({
+            "username": username,
+            "email": email,
+            "password_hash": hash_password(password),
+            "created_at": get_current_timestamp(),
+            "active": True,
+        })
 
         # Log them in
-        session["auth"] = user_id
+        session["auth"] = new_user.id
         return Div(
             P(
                 "Registration successful! Redirecting...",
@@ -667,7 +676,10 @@ async def upload_file(request, session):
                 file_type = "text"
                 storage_path = upload_dir / "text" / unique_filename
 
-            content = await file.read()
+            try:
+                content = await file.read()
+            finally:
+                await file.close()
             async with aiofiles.open(storage_path, "wb") as f:
                 await f.write(content)
 
@@ -741,11 +753,10 @@ async def upload_file(request, session):
     updated_ingested_items = Div(
         *items_content if items_content else [P("No items added yet.", cls=(TextPresets.muted_sm, "italic"))],
         id="ingested-items",
-        _="on load or htmx:afterSwap if .input-item-article in me then remove @disabled from #generate-btn else add @disabled to #generate-btn",
         hx_swap_oob="true"
     )
     
-    workspace_input = Input(type="hidden", id="current-workspace-id", value=workspace_id, hx_swap_oob="true")
+    workspace_input = Input(type="hidden", id="current-workspace-id", name="workspace_id", value=workspace_id, hx_swap_oob="true")
     
     return updated_ingested_items, recent_uploads_update, workspace_input
 
@@ -1014,6 +1025,7 @@ def content_workspace(session, workspace_id: str = None):
                     id="workspace-name-input"
                 )
             ),
+            body_cls="p-0",
             cls=CardT.default
         ),
         # Input Canvas Section
@@ -1044,6 +1056,7 @@ def content_workspace(session, workspace_id: str = None):
                 ),
                 Audio(id="audio-playback", controls=True, cls="w-full hidden")
             ),
+            body_cls="p-0",
             cls=CardT.default
         ),
         
@@ -1058,7 +1071,9 @@ def content_workspace(session, workspace_id: str = None):
                     hx_post="/upload",
                     hx_target="#ingested-items",
                     hx_swap="outerHTML",
-                    _="on htmx:xhr:progress(loaded, total) set #upload-progress.value to (loaded/total)*100 on htmx:configRequest(detail) if #current-workspace-id then set detail.parameters.workspace_id to #current-workspace-id.value end"
+                    id="file-upload-form",
+                    hx_trigger="change from:#workspace-files",
+                    hx_include="#current-workspace-id",
                 )(
                     UploadZone(
                         DivVStacked(
@@ -1068,18 +1083,16 @@ def content_workspace(session, workspace_id: str = None):
                             P("Or click to select files", cls=TextPresets.muted_sm + " mt-2"),
                             cls="text-center py-8"
                         ),
-                        Input(
-                            type="file",
-                            name="files",
-                            multiple=True,
-                            accept=".wav,.mp3,.txt,.png,.jpg,.jpeg",
-                            _="on change trigger submit on closest <form/>"
-                        )
+                        id="workspace-files",
+                        name="files",
+                        multiple=True,
+                        accept=".wav,.mp3,.txt,.png,.jpg,.jpeg",
+                        data_upload_zone="true",
                     ),
-                    Progress(id="upload-progress", value="0", max="100", cls="w-full mt-4 hidden", 
-                            _="on htmx:beforeRequest show me then on htmx:afterRequest hide me")
+                    Progress(id="upload-progress", value=None, cls="w-full mt-4", hidden=True, aria_label="Uploading files"),
                 )
             ),
+            body_cls="p-0",
             cls=CardT.default
         ),
             # Recording JavaScript
@@ -1089,7 +1102,7 @@ def content_workspace(session, workspace_id: str = None):
             window.discarding = window.discarding || false;            window.audioElement = document.getElementById('audio-playback');
             window.startBtn = document.getElementById('start-recording-btn');
             window.stopBtn = document.getElementById('stop-recording-btn');
-            window.status = document.getElementById('recording-status');
+            window.recordingStatusElement = document.getElementById('recording-status');
             window.workspaceId = '{workspace_id}';
 
             async function startRecording() {{
@@ -1114,7 +1127,7 @@ def content_workspace(session, workspace_id: str = None):
                         if (window.discarding) {{
                             // Discard recording
                             stream.getTracks().forEach(track => track.stop());
-                            window.status.textContent = '';
+                            window.recordingStatusElement.textContent = '';
                             window.mediaRecorder = null;
                             window.audioChunks = [];
                             window.discarding = false;
@@ -1162,7 +1175,7 @@ def content_workspace(session, workspace_id: str = None):
 
                         // Stop stream and cleanup
                         stream.getTracks().forEach(track => track.stop());
-                        window.status.textContent = '';
+                        window.recordingStatusElement.textContent = '';
                         
                         // Reset for next recording
                         window.mediaRecorder = null;
@@ -1172,7 +1185,7 @@ def content_workspace(session, workspace_id: str = None):
                     window.mediaRecorder.start();
                     window.startBtn.disabled = true;
                     window.stopBtn.disabled = false;
-                    window.status.textContent = ' Recording...';
+                    window.recordingStatusElement.textContent = ' Recording...';
                 }} catch (err) {{
                     console.error('Error accessing microphone:', err);
                     alert('Microphone access denied or unavailable.');
@@ -1191,19 +1204,9 @@ def content_workspace(session, workspace_id: str = None):
             if (window.mediaRecorder && window.mediaRecorder.state === 'recording') {{
                 window.startBtn.disabled = true;
                 window.stopBtn.disabled = false;
-                window.status.textContent = ' Recording...';
+                window.recordingStatusElement.textContent = ' Recording...';
             }}
 
-            // Handle navigation away during recording
-            document.addEventListener('htmx:beforeSwap', (evt) => {{
-                if (window.mediaRecorder && window.mediaRecorder.state === 'recording' && evt.detail.target.contains(window.startBtn)) {{
-                    window.discarding = true;
-                    window.mediaRecorder.stop();
-                    window.startBtn.disabled = false;
-                    window.stopBtn.disabled = true;
-                    window.status.textContent = '';
-                }}
-            }});
         """),
         
         # Ingested Items Card
@@ -1233,9 +1236,9 @@ def content_workspace(session, workspace_id: str = None):
                         )
                     ],
                     id="ingested-items",
-                    _="on htmx:afterSwap if .input-item-article in me then remove @disabled from #generate-btn else add @disabled to #generate-btn"
                 )
             ),
+            body_cls="p-0",
             cls=CardT.default
         ),
         
@@ -1254,15 +1257,16 @@ def content_workspace(session, workspace_id: str = None):
                         hx_target="#main-content",
                         cls=(ButtonT.primary, "w-full"),
                         id="generate-btn",
-                        _="on htmx:configRequest(detail) if #current-workspace-id then set detail.parameters.workspace_id to #current-workspace-id.value end",
+                        hx_include="#current-workspace-id",
                         disabled=False if items_content else True
                     )
                 )
             ),
+            body_cls="p-0",
             cls=CardT.default
         ),
         Div(id="report-section"),
-        Input(type="hidden", id="current-workspace-id", value=workspace_id),
+        Input(type="hidden", id="current-workspace-id", name="workspace_id", value=workspace_id),
         Div(id="modal-container"),
     )
 
@@ -1295,6 +1299,7 @@ def modal_add_input(workspace_id: str, session):
                           cls=TextPresets.muted_sm)
                     )
                 ),
+                body_cls="p-0",
                 hx_post=f"/add-item-to-workspace/{workspace_id}/{item.id}",
                 hx_target=f"#modal-item-{item.id}",
                 hx_swap="outerHTML",
@@ -1410,7 +1415,7 @@ def update_transcription(item_id: str, session, transcription: str):
         updated_article = Article(
             *article.children,
             id=article.attrs.get("id"),
-            cls=article.attrs.get("cls"),
+            cls=article.attrs.get("class"),
             hx_swap_oob="true"
         )
         
@@ -1641,7 +1646,7 @@ async def detect_entity_in_image(item_id: str, session, entity_type: str):
                     # Image preview with bounding boxes
                     Center(
                         Img(
-                            src=f"uploads/images/{Path(result['preview_path']).name}",
+                            src=f"/uploads/images/{Path(result['preview_path']).name}",
                             alt="Preview with detected entities",
                             cls="max-w-full max-h-72 border-2 border-border rounded-lg mb-4"
                         ),
@@ -1905,7 +1910,6 @@ def add_item_to_workspace(workspace_id: str, item_id: str, session):
         updated_ingested_items = Div(
             *items_content if items_content else [P("No items added yet.")],
             id="ingested-items",
-            _="on load or htmx:afterSwap if .input-item-article in me then remove @disabled from #generate-btn else add @disabled to #generate-btn",
             hx_swap_oob="true"
         )
         
@@ -1946,7 +1950,7 @@ def content_reports(session):
             # Status label styling
             status_label_class = {
                 'open': 'bg-amber-100 text-amber-800',
-                'in_progress': 'bg-blue-100 text-blue-800', 
+                'in_progress': 'status-active',
                 'completed': 'bg-green-100 text-green-800',
                 'closed': 'bg-gray-100 text-gray-800'
             }.get(report.status, 'bg-gray-100 text-gray-800')
@@ -1997,6 +2001,7 @@ def content_reports(session):
                             cls="space-y-3"
                         )
                     ),
+                    body_cls="p-0",
                     cls=(CardT.hover, "cursor-pointer"),
                     hx_get=f"/content/view-report/{report.id}",
                     hx_target="#main-content"
@@ -2020,6 +2025,7 @@ def content_reports(session):
                         )
                     )
                 ),
+                body_cls="p-0",
                 cls=CardT.default
             )
         ]
@@ -2082,6 +2088,7 @@ def content_dashboard(session):
                         ),
                         cls="p-0"
                     ),
+                    body_cls="p-0",
                     cls=CardT.default
                 ),
                 
@@ -2109,6 +2116,7 @@ def content_dashboard(session):
                         ),
                         cls="p-0"
                     ),
+                    body_cls="p-0",
                     cls=CardT.default
                 ),
                 
@@ -2140,6 +2148,7 @@ def content_dashboard(session):
                         ),
                         cls="p-0"
                     ),
+                    body_cls="p-0",
                     cls=CardT.default
                 ),
                 
@@ -2199,6 +2208,7 @@ def content_dashboard(session):
                                                     )
                                                 )
                                             ),
+                                            body_cls="p-0",
                                             cls=(CardT.hover, "cursor-pointer"),
                                             hx_get=f"/content/view-report/{report.id}",
                                             hx_target="#main-content"
@@ -2215,6 +2225,7 @@ def content_dashboard(session):
                                 cls="space-y-3"
                             )
                         ),
+                        body_cls="p-0",
                         cls=CardT.default
                     ),
                     cls=SectionT.default
@@ -2249,6 +2260,7 @@ def content_dashboard(session):
                                 )
                             )
                         ),
+                        body_cls="p-0",
                         cls=CardT.default
                     ),
                     cls=SectionT.default
@@ -2312,20 +2324,21 @@ def content_workspaces(session):
                                 cls="space-x-4"
                             )
                         ),
+                        body_cls="p-0",
                         hx_get=f"/content/workspace/{workspace.id}",
                         hx_target="#main-content",
                         cls=(CardT.hover, "cursor-pointer flex-1"),
-                        title=f"Open {workspace.name}"
+                        title=f"Open {workspace.name}",
+                        data_workspace_card="true"
                     ),
                     Button(
                         UkIcon("trash-2", height=20, width=20),
-                        hx_delete=f"/delete-workspace/{workspace.id}",
-                        hx_target="closest div",
-                        hx_swap="outerHTML",
+                        hx_delete=f"/delete-workspace/{workspace.id}?source=workspace",
+                        hx_target="#main-content",
+                        hx_swap="innerHTML",
                         hx_confirm="Are you sure you want to delete this workspace?",
                         cls=(ButtonT.destructive, "ml-4 p-3"),
                         title="Delete workspace",
-                        _="on htmx:afterRequest if detail.successful then wait 10ms then set #workspaces-count's textContent to 'You have ' + document.querySelectorAll('#main-content .card').length + ' workspaces.' end"
                     ),
                     cls="mb-4 items-start"
                 )
@@ -2371,6 +2384,7 @@ def content_workspaces(session):
                             )
                         )
                     ),
+                    body_cls="p-0",
                     cls=CardT.default
                 )
             ],
@@ -2429,6 +2443,7 @@ def content_view_input(input_id: str, session):
                             placeholder="Transcription will appear here..."
                         )
                     ),
+                    body_cls="p-0",
                     cls=CardT.default
                 )
             else:
@@ -2445,6 +2460,7 @@ def content_view_input(input_id: str, session):
                             cls=ButtonT.primary
                         )
                     ),
+                    body_cls="p-0",
                     cls=CardT.default
                 )
         elif input_item.transcription:
@@ -2452,6 +2468,7 @@ def content_view_input(input_id: str, session):
             transcription_section = Card(
                 CardHeader(H4("Transcription")),
                 CardBody(P(input_item.transcription)),
+                body_cls="p-0",
                 cls=CardT.default
             )
         
@@ -2474,12 +2491,13 @@ def content_view_input(input_id: str, session):
                 CardBody(
                     Center(
                         Img(
-                            src=f"uploads/images/{Path(input_item.file_path).name}",
+                            src=f"/uploads/images/{Path(input_item.file_path).name}",
                             alt=f"Preview of {input_item.original_filename}",
                             cls="max-w-full max-h-96 rounded-lg object-contain shadow-sm"
                         )
                     )
                 ),
+                body_cls="p-0",
                 cls=CardT.default
             )
         
@@ -2589,6 +2607,7 @@ def content_view_input(input_id: str, session):
                         CardBody(
                             Form(*form_fields, cls="space-y-4")
                         ),
+                        body_cls="p-0",
                         cls=CardT.default
                     )
                 else:
@@ -2607,6 +2626,7 @@ def content_view_input(input_id: str, session):
                                 rows=6
                             )
                         ),
+                        body_cls="p-0",
                         cls=CardT.default
                     )
             except:
@@ -2625,6 +2645,7 @@ def content_view_input(input_id: str, session):
                             rows=6
                         )
                     ),
+                    body_cls="p-0",
                     cls=CardT.default
                 )
         
@@ -2658,6 +2679,7 @@ def content_view_input(input_id: str, session):
                             cols=3, cls="gap-6"
                         )
                     ),
+                    body_cls="p-0",
                     cls=CardT.default
                 ),
                 cls=SectionT.default
@@ -2735,6 +2757,7 @@ def content_view_report(report_id: str, session):
                         style="text-align: left;"
                     )
                 ),
+                body_cls="p-0",
                 cls=CardT.default
             ),
             cls=ContainerT.lg
@@ -2855,6 +2878,7 @@ def content_edit_report(report_id: str, session):
                         ),
                     )
                 ),
+                body_cls="p-0",
                 cls=CardT.default
             ),
             cls=ContainerT.lg
@@ -3071,7 +3095,6 @@ def remove_from_workspace(workspace_id: str, input_id: str, session):
         updated_ingested_items = Div(
             *items_content if items_content else [P("No items added yet.", cls=(TextPresets.muted_sm, "italic"))],
             id="ingested-items",
-            _="on load or htmx:afterSwap if .input-item-article in me then remove @disabled from #generate-btn else add @disabled to #generate-btn",
             hx_swap_oob="true"
         )
         
@@ -3103,7 +3126,11 @@ def delete_input(input_id: str, session):
                 workspaces.update({"input_item_ids": json.dumps(item_ids)}, workspace.id)
         
         input_items.delete(input_id)
-        return create_recent_uploads_section(user.id, swap_oob=True)
+        return (
+            content_inputs(session),
+            create_recent_uploads_section(user.id, swap_oob=True),
+            create_recent_workspaces_section(user.id, swap_oob=True),
+        )
     except Exception as e: return Div(f"Error deleting input: {str(e)}")
 
 
@@ -3160,4 +3187,5 @@ def logout(session):
     session.clear()
     return RedirectResponse("/", status_code=303)
 
-serve()
+if __name__ == "__main__":
+    serve()

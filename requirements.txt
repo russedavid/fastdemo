@@ -1,5 +1,7 @@
-python-fasthtml
-fastlite
+python-fasthtml==0.14.13
+fastcore==2.2.22
+fastlite==0.2.4
+monsterui==1.0.47
 httpx
 aiofiles
 moondream
