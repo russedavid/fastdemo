@@ -5,6 +5,7 @@ class User:
     password_hash: str
     created_at: str
     active: bool = True
+    demo_expires_at: str = ""
 
 class Workspace:
     id: str  # UUID
@@ -28,6 +29,7 @@ class InputItem:
     processed: bool = False
     transcription: str = ""
     extracted_data: str = ""  # JSON string
+    text_origin: str = "user"
 
 class MaintenanceReport:
     id: str  # UUID
@@ -46,6 +48,22 @@ class MaintenanceReport:
     priority: str = "medium"  # low, medium, high, critical
     status: str = "open"  # open, in_progress, completed, closed
     finalized: bool = False
+    evidence_json: str = ""
+    sources_json: str = ""
+    model_id: str = ""
+    generation_usage: str = ""
+    review_notes: str = ""
+
+class Generation:
+    id: str
+    user_id: int
+    workspace_id: str
+    created_at: str
+    updated_at: str
+    status: str = "queued"
+    report_id: str = ""
+    error: str = ""
+    sources_json: str = ""
 
 class ReportAnnotation:
     id: str  # UUID

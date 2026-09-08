@@ -1,0 +1,3 @@
+# Optional legacy bounding-box detection; the public demo uses Groq image notes.
+-r requirements.txt
+moondream

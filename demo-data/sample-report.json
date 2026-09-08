@@ -1,0 +1,85 @@
+{
+  "label": "Saved example generated from a synthetic development case",
+  "case_id": "FL-001",
+  "sources": [
+    {
+      "id": "FL-001-N1",
+      "filename": "Pump P-17 inspection.txt",
+      "type": "text",
+      "origin": "synthetic",
+      "text": "Work order WO-104, unit P-17. Replaced the inlet filter with one FIL-08 cartridge. Recorded a small drip at the outlet joint. I suggest inspecting the outlet seal at the next visit and considering kit SEAL-02. The seal has not been replaced; no SEAL-02 kit was fitted. No next visit has been scheduled."
+    }
+  ],
+  "report": {
+    "completed_work": [
+      {
+        "source_ids": [
+          "FL-001-N1"
+        ],
+        "text": "Replaced the inlet filter with one FIL-08 cartridge."
+      }
+    ],
+    "equipment_id": {
+      "source_ids": [
+        "FL-001-N1"
+      ],
+      "state": "known",
+      "value": "P-17"
+    },
+    "next_service_date": {
+      "source_ids": [
+        "FL-001-N1"
+      ],
+      "state": "unknown",
+      "value": null
+    },
+    "observations": [
+      {
+        "source_ids": [
+          "FL-001-N1"
+        ],
+        "text": "A small drip was recorded at the outlet joint."
+      },
+      {
+        "source_ids": [
+          "FL-001-N1"
+        ],
+        "text": "The seal has not been replaced; no SEAL-02 kit was fitted."
+      }
+    ],
+    "parts_used": {
+      "items": [
+        {
+          "part_number": "FIL-08",
+          "quantity": 1,
+          "source_ids": [
+            "FL-001-N1"
+          ]
+        }
+      ],
+      "source_ids": [
+        "FL-001-N1"
+      ],
+      "state": "known"
+    },
+    "priority": {
+      "source_ids": [
+        "FL-001-N1"
+      ],
+      "state": "unknown",
+      "value": null
+    },
+    "proposed_actions": [
+      {
+        "basis": "source",
+        "source_ids": [
+          "FL-001-N1"
+        ],
+        "text": "Inspect the outlet seal at the next visit and consider using kit SEAL-02."
+      }
+    ],
+    "uncertainties": []
+  },
+  "model": "qwen/qwen3.8-27b",
+  "generated_at": "2026-09-08T14:57:45+00:00"
+}

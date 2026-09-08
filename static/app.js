@@ -35,6 +35,25 @@
     }
     onHtmx('htmx:before:request', event => setUploadBusy(event, true));
     onHtmx('htmx:finally:request', event => setUploadBusy(event, false));
+    onHtmx('htmx:response:error', event => {
+        const message = document.getElementById('app-messages');
+        if (message) {
+            const status = event.detail.ctx?.response?.status;
+            message.textContent = status === 413
+                ? 'Upload too large. Use files up to 4 MB, at most two at a time.'
+                : 'This request could not be completed. Your saved workspace is still available.';
+            message.setAttribute('role', 'alert');
+        }
+    });
+    document.addEventListener('change', event => {
+        if (event.target.id !== 'workspace-files') return;
+        const files = [...(event.target.files || [])];
+        if (files.length <= 2 && files.every(file => file.size <= 4 * 1024 * 1024)) return;
+        event.stopImmediatePropagation();
+        event.target.value = '';
+        const message = document.getElementById('app-messages');
+        if (message) message.textContent = 'Choose at most two files, up to 4 MB each.';
+    }, true);
 
     onHtmx('htmx:before:swap', event => {
         const replacesRecorder = (event.detail.tasks || []).some(

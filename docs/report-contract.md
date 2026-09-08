@@ -2,7 +2,7 @@
 
 The existing generator asks for recommendations and suggested parts in fields that can be read as a record of completed work. The new component separates those meanings and gives missing or disputed facts an explicit representation.
 
-`reporting.py` defines the schema, builds a structured-output request, and validates a returned report. `report-instructions.txt` supplies the source-fidelity instructions. This component is callable through the evaluation runner; integrating the new shape into the app's database and UI is a separate step.
+`reporting.py` defines the schema, builds a structured-output request, and validates a returned report. `report-instructions.txt` supplies the source-fidelity instructions. This component is used by the application's Groq adapter and background report workflow. Reports persist the validated structure and an immutable source snapshot; the UI displays source links, unknown fields, and conflicts. Existing flat reports remain readable. See [the hosting guide](hosting.md) for deployment and limits.
 
 ## Source packet
 

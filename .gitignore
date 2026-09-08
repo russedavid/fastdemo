@@ -11,4 +11,7 @@ __pycache__/
 /uploads/
 /data/*.db
 /data/*.db-*
+/data/.session-key
+/data/*.sqlite3
+/data/*.sqlite3-*
 /evals/runs/

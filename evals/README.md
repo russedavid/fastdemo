@@ -46,3 +46,7 @@ Only source packets enter model requests. Case titles, reference interpretations
 Read [the cases](reference-cases.md) and [the report contract](../docs/report-contract.md). Record JSON/validation failures separately from semantic judgments. Check that sources actually support statements, missing information stays unknown, disagreements remain visible, and proposed work is not presented as completed.
 
 A real source ID or schema-valid response does not prove a claim is true. Keep failures and regressions, disclose model and instruction changes, and use a larger fresh assessment set before making stronger quality claims.
+
+## Hosted Groq compatibility checks
+
+The application now uses the report component through `groq_service.py`. With the application dependencies installed, run `python -m evals.check_groq --credentials .env.hosting.local` to evaluate the five synthetic development cases on its request format. This makes real Groq calls, uses the deployed 768-token output cap, spaces requests to respect the observed account output limit, records raw responses, and stops on provider errors. See [hosting validation](../docs/hosting.md) for results and limitations. The original Ollama experiments and runner remain unchanged.

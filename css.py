@@ -132,3 +132,13 @@ input, textarea, select, progress { accent-color: hsl(var(--primary)); }
     }
 }
 """
+
+css += """
+.demo-intro { max-width: 46rem; margin: clamp(2rem, 8vh, 6rem) auto; }
+.demo-intro h1 { font-size: clamp(2rem, 4vw, 3.25rem); line-height: 1.12; }
+.source-text { white-space: pre-wrap; overflow-wrap: anywhere; font-family: inherit; line-height: 1.65; max-width: 100%; }
+.source-panel { border: 1px solid #d9caba; border-radius: .5rem; margin: 1rem 0; padding: 1rem; }
+.source-panel summary { cursor: pointer; font-weight: 600; margin-bottom: .5rem; }
+.source-citation { color: #765438; text-decoration: underline; font-weight: 600; padding: 0 .15rem; }
+#app-messages:not(:empty) { background: #f2e5d3; border: 1px solid #d9caba; padding: .8rem 1rem; margin-bottom: 1rem; border-radius: .5rem; }
+"""

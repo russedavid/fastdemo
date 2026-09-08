@@ -12,8 +12,9 @@ This is a maintenance report application built with FastHTML that allows users t
 - **Hyperscript**: For client-side interactions and event handling
 
 ### APIs & Services
-- **OpenAI Whisper API**: Audio transcription
-- **OpenAI GPT-3.5-turbo**: Entity extraction and report generation
+- **Groq Whisper**: Audio transcription
+- **Groq Qwen 3.8 27B**: Structured report generation and image descriptions
+- **Legacy OpenAI/Moondream functions**: Retained in ai_services.py for historical experiments and optional local features; not used by the public demo
 
 ### File Handling
 - **aiofiles**: Async file operations
@@ -42,7 +43,12 @@ This is a maintenance report application built with FastHTML that allows users t
 ### Core Files
 - `main.py`: Main application with all routes and components
 - `models.py`: Data models (User, Workspace, InputItem, MaintenanceReport, etc.)
-- `ai_services.py`: OpenAI API integrations
+- `groq_service.py`: Explicit Groq calls, structured validation, and quota handling
+- `report_workflow.py`: Background jobs and immutable source snapshots
+- `report_views.py`: Evidence report rendering and separate reviewer notes
+- `hosting_runtime.py`: Persistent budgets, body limits, and runtime paths
+- `deploy/alwaysdata.py`: Free-plan deployment; explicit application-file allowlist
+- `ai_services.py`: Legacy provider functions
 - `utils.py`: Helper functions (UUID generation, timestamps, password hashing)
 - `css.py`: Application styles
 
@@ -177,3 +183,6 @@ sqlite3 data/frontline.db ".tables"
 - Check `hx-target` and `hx-swap` attributes
 - Verify `hx_swap_oob` elements have correct IDs
 - Test navigation between views to ensure state consistency
+## Public demo deployment
+
+See `docs/hosting.md` for the current deployment, quotas, and validation record. `FRONTLINE_DATA_DIR` keeps runtime files outside release directories. Public demo sessions have separate visitor identities and expire after 24 hours. Preserve the owner checks, source snapshots, session key, and persistent usage budgets when modifying routes. The alwaysdata SSH and HTTP users are different Unix users in the same account group, so the startup script and application environment need group access. Local hosting credentials and deployment state are ignored by Git and must not enter the app bundle.

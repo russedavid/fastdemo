@@ -8,7 +8,7 @@ A lightweight FastHTML application that transforms unstructured frontline inputs
 - **Workspace System**: Create and manage multiple workspaces for different projects
 - **Multi-Modal Input**: Drag-and-drop interface for audio (.webm/.mp3/.wav), text files, and images
 - **Live Audio Recording**: Record audio directly in the browser with WebM format
-- **AI-Powered Transcription**: Real-time audio transcription using OpenAI Whisper API
+- **AI-Powered Transcription**: Recorded audio transcribed through Groq Whisper
 - **Interactive Transcription Editing**: 
   - Click-to-edit transcription previews with modal interface
   - 500ms debounced auto-save for seamless editing
@@ -22,7 +22,7 @@ A lightweight FastHTML application that transforms unstructured frontline inputs
 - **Backend**: FastHTML (Python) with reactive components and HTMX integration
 - **Database**: SQLite with FastLite ORM for rapid prototyping
 - **Frontend**: HTMX for dynamic interactions, Hyperscript for client-side logic
-- **AI Integration**: OpenAI Whisper API and GPT-3.5-turbo via httpx
+- **AI Integration**: Groq Qwen 3.8 27B and Whisper via httpx; source validation with Pydantic
 - **File Storage**: Organized local storage with audio/image/text separation
 - **State Management**: Window object pattern for persistent client-side state
 
@@ -30,7 +30,7 @@ A lightweight FastHTML application that transforms unstructured frontline inputs
 
 ### Prerequisites
 - Python 3.11+
-- OpenAI API key
+- Groq API key on the Free tier for live inference
 
 ### Installation
 
@@ -40,9 +40,9 @@ A lightweight FastHTML application that transforms unstructured frontline inputs
    pip install -r requirements.txt
    ```
 
-3. Set your OpenAI API key:
+3. Set your Groq API key:
    ```bash
-   export OPENAI_API_KEY=your_api_key_here
+   export GROQ_API_KEY=your_api_key_here
    ```
 
 4. Run the application:
@@ -51,6 +51,8 @@ A lightweight FastHTML application that transforms unstructured frontline inputs
    ```
 
 5. Open your browser to `http://localhost:5001`
+
+For the public demo, deployment, limits, and validation results, see [the hosting guide](docs/hosting.md). Live reports preserve their source snapshots, unknown fields, and disagreements. The public demo gives each visitor a separate temporary workspace. Moondream bounding-box detection is an optional legacy feature installed through `requirements-vision.txt`; the public demo uses Groq image descriptions.
 
 The UI uses HTMX 4.0.0 through FastHTML's native `htmx4` support, FastHTML 0.14.13, FastLite 0.2.4, and MonsterUI 1.0.47. The theme is a fixed light palette with beige surfaces and brown accents. See [UI migration notes](docs/ui-migration.md) for version choices and compatibility changes.
 
@@ -114,7 +116,7 @@ The UI uses HTMX 4.0.0 through FastHTML's native `htmx4` support, FastHTML 0.14.
 - **HTMX**: Dynamic interactions without complex JavaScript frameworks
 - **Hyperscript**: Declarative client-side logic for UI interactions
 - **SQLite + FastLite**: Simple, file-based database with ORM integration
-- **OpenAI APIs**: Industry-standard Whisper and GPT integration
+- **Groq APIs**: Qwen report generation and Whisper transcription with persistent usage limits
 - **WebM Audio**: Modern format with good browser support and Whisper compatibility
 
 ### Deferred for Production
@@ -130,7 +132,7 @@ The UI uses HTMX 4.0.0 through FastHTML's native `htmx4` support, FastHTML 0.14.
 
 ## Evidence-backed reporting component
 
-The new [report component](docs/report-contract.md) separates observations, completed work, proposed actions, and unknown or disputed values, with source references and validation. It is available through a local evaluation runner; the app's existing database and UI have not yet been migrated to this report shape.
+The new [report component](docs/report-contract.md) separates observations, completed work, proposed actions, and unknown or disputed values, with source references and validation. It is integrated into the app's background generation workflow and evidence report view. Existing flat reports remain readable. Both local Ollama experiments and bounded Groq development checks are available under evals/.
 
 Run its offline tests from the repository root:
 

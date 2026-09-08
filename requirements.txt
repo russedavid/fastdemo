@@ -4,6 +4,5 @@ fastlite==0.2.4
 monsterui==1.0.47
 httpx
 aiofiles
-moondream
 pillow
 pydantic>=2,<3

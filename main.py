@@ -2,7 +2,10 @@ from fasthtml.common import *
 from fastlite import *
 from pathlib import Path
 import json
-from datetime import datetime
+import os
+import secrets
+import time
+from datetime import datetime, timedelta, timezone
 import aiofiles
 from ai_services import *
 from models import *
@@ -10,23 +13,28 @@ from utils import *
 from monsterui.all import *
 from css import css
 from starlette.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException
+from hosting_runtime import DemoSettings, Budget, LimitReached, RequestLimits
+from groq_service import GroqService, ProviderUnavailable
+from report_workflow import ReportWorkflow
+from report_views import evidence_report_view, evidence_report_editor
 
-# Create necessary directories
-upload_dir = Path("uploads")
-upload_dir.mkdir(exist_ok=True)
-(upload_dir / "audio").mkdir(exist_ok=True)
-(upload_dir / "images").mkdir(exist_ok=True)
-(upload_dir / "text").mkdir(exist_ok=True)
-data_dir = Path("data")
-data_dir.mkdir(exist_ok=True)
 
-db = database("data/frontline.db")
+settings = DemoSettings()
+upload_dir = settings.upload_dir
+data_dir = settings.data_dir
+db = database(data_dir / "frontline.db")
 
 users = db.create(User, pk="id", transform=True)
 workspaces = db.create(Workspace, pk="id", transform=True)
 input_items = db.create(InputItem, pk="id", transform=True)
 maintenance_reports = db.create(MaintenanceReport, pk="id", transform=True)
 report_annotations = db.create(ReportAnnotation, pk="id", transform=True)
+generations = db.create(Generation, pk="id", transform=True)
+budget = Budget(data_dir / "usage.sqlite3")
+groq = GroqService(budget)
+workflow = ReportWorkflow(settings, budget, groq, workspaces, input_items, maintenance_reports, generations)
+
 
 # SPA Components
 def create_recent_reports_section(user_id: int, swap_oob: bool = False):
@@ -242,7 +250,7 @@ def build_input_item_fragment(item, workspace_id=None):
     )
     
     # Detect Entity button for image files
-    if item.file_type == "image":
+    if item.file_type == "image" and not settings.demo:
         action_buttons.append(
             Button(
                 UkIcon("search", height=14, width=14, cls="mr-1"),
@@ -253,6 +261,12 @@ def build_input_item_fragment(item, workspace_id=None):
             )
         )
     
+    if item.file_type == "image" and settings.demo:
+        action_buttons.append(Button("Read image", hx_post=f"/describe-image/{item.id}",
+                                     hx_target=f"#input-article-{item.id}", hx_swap="outerHTML", cls=ButtonT.secondary))
+        if item.transcription:
+            content_sections.append(P("Image notes: " + item.transcription, cls="source-text"))
+
     # Delete/Remove button with workspace context
     if workspace_id:
         # In workspace context: "Remove" button that only removes from workspace
@@ -396,10 +410,20 @@ def create_sidebar(user):
     )
 
 
-def create_default_content():
+def create_default_content(user=None):
     """Create default content for the main area"""
+    if settings.demo and user:
+        samples = maintenance_reports(where="user_id=?", where_args=[user.id], limit=1)
+        return Div(
+            H1("Every finding, tied to its source."),
+            P("Explore a completed report, then edit the sample notes or add your own inputs and generate a new one."),
+            P("This is a personal demo. Use synthetic or non-sensitive inputs. Your private demo workspace expires after 24 hours.", cls=TextPresets.muted_sm),
+            Button("Explore the sample report", hx_get=f"/content/view-report/{samples[0].id}", hx_target="#main-content", cls=ButtonT.primary) if samples else None,
+            Button("Open sample workspace", hx_get=f"/content/workspace/{samples[0].workspace_id}", hx_target="#main-content", cls=ButtonT.secondary) if samples else None,
+            cls="p-8 space-y-5",
+        )
     return Div(
-        H1("Welcome to Report Generator"),
+        H1("Welcome to Frontline"),
         P("Transform unstructured frontline inputs into structured maintenance reports using AI."),
         P("Select an option from the sidebar to get started, or create a new report."),
         Div(
@@ -419,15 +443,40 @@ def create_default_content():
 
 login_redir = RedirectResponse("/login", status_code=303)
 def user_auth_before(req, session):
-    auth = req.scope["auth"] = session.get("auth", None)
-    print(session)
-    if not auth:
+    auth = session.get("auth")
+    req.scope["auth"] = auth
+    public = {"/", "/login", "/send_login", "/register", "/register-user", "/demo/start", "/healthz"}
+    if req.url.path in public or req.url.path.startswith("/static/"):
+        return
+    if not isinstance(auth, int):
         return login_redir
+    try:
+        user = users[auth]
+        if user.demo_expires_at and session.get("visitor") != user.username:
+            session.clear()
+            return login_redir
+        if user.demo_expires_at and user.demo_expires_at < datetime.now(timezone.utc).isoformat():
+            session.clear()
+            return login_redir
+    except Exception:
+        session.clear()
+        return login_redir
+    for name, table in (("workspace_id", workspaces), ("item_id", input_items),
+                        ("input_id", input_items), ("report_id", maintenance_reports),
+                        ("generation_id", generations)):
+        value = req.path_params.get(name)
+        if value:
+            try:
+                row = table[value]
+                if row.user_id != auth:
+                    raise KeyError(value)
+            except Exception:
+                raise HTTPException(404, "Not found")
+    if settings.demo and any(req.url.path.startswith(prefix) for prefix in
+                             ("/modal/detect-entity/", "/detect-entity/", "/accept-entity-detection/", "/reject-entity-detection/")):
+        raise HTTPException(404, "Not available in this demo")
 
-bware = Beforeware(
-    user_auth_before,
-    skip=[r"/login", r"/send_login", r"/register", r"/", r"/register-user", r"/static"],
-)
+bware = Beforeware(user_auth_before)
 
 hdrs = Theme.stone.headers(mode="light", radii=ThemeRadii.lg)
 hdrs.append(Script(src="https://unpkg.com/hyperscript.org@0.9.14"))
@@ -440,26 +489,49 @@ app = FastHTML(
     pico=False,
     htmx4=True,
     htmlkw={"lang": "en", "class": "frontline-theme", "data-theme": "light"},
-    secret_key="your-secret-key-change-in-production",
+    secret_key=settings.session_key,
+    sess_https_only=settings.demo and os.getenv("FRONTLINE_HTTPS_ONLY", "1") == "1",
+    max_age=86400 if settings.demo else 31536000,
+    on_shutdown=[workflow.shutdown],
 )
 app.mount("/static", StaticFiles(directory=Path(__file__).resolve().parent / "static"))
+app.add_middleware(RequestLimits, max_bytes=settings.max_request_bytes)
 rt = app.route
 
 # Serve uploaded files
 @rt("/uploads/{file_type}/{filename}")
-def serve_file(file_type: str, filename: str):
-    file_path = upload_dir / file_type / filename
-    if file_path.exists():
-        return FileResponse(file_path)
-    return "Not found", 404
+def serve_file(file_type: str, filename: str, session):
+    if file_type not in ("audio", "images", "text") or Path(filename).name != filename:
+        raise HTTPException(404)
+    matches = input_items(where="filename=? AND user_id=?", where_args=[filename, session.get("auth")])
+    file_path = (upload_dir / file_type / filename).resolve()
+    if matches and file_path.is_relative_to(upload_dir) and file_path.is_file():
+        return FileResponse(file_path, media_type=matches[0].mime_type,
+                            headers={"X-Content-Type-Options": "nosniff", "Cache-Control": "private, no-store"})
+    raise HTTPException(404)
+
 
 @rt
 def index(session):
     auth = session.get("auth", None)
+    if auth:
+        try:
+            current_user = users[auth]
+            if current_user.demo_expires_at and session.get("visitor") != current_user.username:
+                session.clear()
+                auth = None
+            if current_user.demo_expires_at and current_user.demo_expires_at < datetime.now(timezone.utc).isoformat():
+                session.clear()
+                auth = None
+        except Exception:
+            session.clear()
+            auth = None
+    if not auth and settings.demo:
+        return demo_landing()
     if not auth:
-        return Titled("Maintenance Report Generator",
+        return Titled("Frontline",
             Container(Section(
-                H1("Welcome to the Maintenance Report Generator"),
+                H1("Welcome to the Frontline"),
                 P(
                     "Transform unstructured frontline inputs into structured maintenance reports using AI."
                 ),
@@ -471,7 +543,7 @@ def index(session):
         )))
 
     user = users[auth]
-    return Title("Maintenance Report Generator"), Container(
+    return Title("Frontline"), Container(
         # Mobile sidebar tab - positioned as a tab on the left edge
         Button(
             UkIcon("panel-left", height=18, width=18),
@@ -482,17 +554,17 @@ def index(session):
         ),
         NavBar(
             DivRAligned(
-                Span(f"Welcome, {user.username}", cls="mr-4 hidden sm:inline"),
+                Span("Your demo workspace" if settings.demo else f"Welcome, {user.username}", cls="mr-4 hidden sm:inline"),
                 A("Logout", href="/logout", role="button", cls=ButtonT.ghost),
             ),
-            brand=H3("Maintenance Report Generator")
+            brand=H3("Frontline")
         ),
         Div(
             create_sidebar(user),
             Div(
-                create_default_content(),
-                id="main-content",
-                cls="p-4 overflow-y-auto flex-1 md:ml-0",
+                Div(id="app-messages", aria_live="polite"),
+                Div(create_default_content(user), id="main-content"),
+                cls="p-4 overflow-y-auto flex-1 min-w-0 md:ml-0",
             ),
             # Mobile overlay to close sidebar when clicking outside
             Div(
@@ -506,8 +578,10 @@ def index(session):
 
 @rt
 def login():
+    if settings.demo:
+        return demo_landing()
     return Titled(
-        "Login - Maintenance Report Generator",
+        "Login - Frontline",
         Section(
             H1("Login"),
             Form(action="/send_login",method="post")(
@@ -527,9 +601,10 @@ def login():
 
 @rt
 def send_login(username: str, password: str, session):
+    if settings.demo:
+        return RedirectResponse("/", status_code=303)
     try:
-        user = users(where=f"username = '{username}' AND active = 1")[0]
-        print(f"User found: {user.username}")
+        user = users(where="username=? AND active=1", where_args=[username])[0]
         if verify_password(password, user.password_hash):
             session["auth"] = user.id
             return RedirectResponse("/", status_code=303)
@@ -544,6 +619,8 @@ def send_login(username: str, password: str, session):
 
 @rt
 def register():
+    if settings.demo:
+        return demo_landing()
     return Titled(
         "Register - Report Generator",
         Container(
@@ -591,9 +668,13 @@ def register():
 
 @rt("/register-user")
 def post(username: str, email: str, password: str, session):
+    if settings.demo:
+        return RedirectResponse("/", status_code=303)
     try:
+        if not 1 <= len(username) <= 100 or len(email) > 254 or not 8 <= len(password) <= 256:
+            return Div("Use a username up to 100 characters and a password of 8–256 characters.")
         # Check if username already exists
-        existing_users = users(where=f"username = '{username}' OR email = '{email}'")
+        existing_users = users(where="username=? OR email=?", where_args=[username, email])
 
         if existing_users:
             return Div(
@@ -626,139 +707,94 @@ def post(username: str, email: str, password: str, session):
         )
 
 
+def upload_fragment(user_id, workspace_id, message=None):
+    workspace = workflow.get_workspace(workspace_id, user_id)
+    items = [input_items[item_id] for item_id in json.loads(workspace.input_item_ids or "[]")]
+    content = Div(*(build_input_item_fragment(item, workspace_id) for item in items), id="ingested-items", hx_swap_oob="true")
+    if not items:
+        content = Div(P("No items added yet."), id="ingested-items", hx_swap_oob="true")
+    return (content, create_recent_uploads_section(user_id, swap_oob=True),
+            Div(P(message, role="alert") if message else None, id="app-messages", hx_swap_oob="true"))
+
+
 @rt("/upload")
 async def upload_file(request, session):
-    """Handle file uploads via drag-and-drop or file input"""
-    auth = session.get("auth")
-    form = await request.form()
-    files = form.getlist("files")
-    workspace_id = form.get("workspace_id", generate_uuid())
-    user = users[auth]
-    print(f"Upload called with workspace_id: {workspace_id}, files: {len(files) if files else 0}")
-    print(f"Form keys: {list(form.keys())}")
-    if files:
-        print(f"First file type: {type(files[0])}")
-        if hasattr(files[0], 'filename'):
-            print(f"First file: filename={files[0].filename}, content_type={files[0].content_type}")
-        else:
-            print(f"First file value: {files[0]}")
-
-    # Create workspace if it doesn't exist
+    user_id = session["auth"]
+    form = await request.form(max_files=2, max_fields=10)
+    workspace_id = form.get("workspace_id")
     try:
-        workspace = workspaces[workspace_id]
-    except:
-        workspace = workspaces.insert(
-            Workspace(
-                id=workspace_id,
-                user_id=user.id,
-                name=f"Workspace {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-                created_at=get_current_timestamp(),
-                updated_at=get_current_timestamp(),
-                status="draft",
-            )
-        )
-
-    uploaded_items = []
-    for file in files:
-        print(f"Processing file: {file.filename}, content_type: {file.content_type}")
-        if file.filename:
-            file_ext = Path(file.filename).suffix
-            unique_filename = f"{generate_uuid()}{file_ext}"
-
-            # Handle webm recordings and other audio types
-            if file.content_type.startswith("audio/") or file.filename.endswith(('.webm', '.m4a')):
-                file_type = "audio"
-                storage_path = upload_dir / "audio" / unique_filename
-            elif file.content_type.startswith("image/"):
-                file_type = "image"
-                storage_path = upload_dir / "images" / unique_filename
-            else:
-                file_type = "text"
-                storage_path = upload_dir / "text" / unique_filename
-
-            try:
-                content = await file.read()
-            finally:
-                await file.close()
-            async with aiofiles.open(storage_path, "wb") as f:
-                await f.write(content)
-
+        workspace = workflow.get_workspace(workspace_id, user_id)
+    except Exception:
+        await form.close()
+        raise HTTPException(404, "Workspace not found")
+    files = form.getlist("files")
+    try:
+        if not files or len(files) > 2:
+            raise ValueError("Choose one or two files, up to 4 MB each.")
+        if len(json.loads(workspace.input_item_ids or "[]")) + len(files) > 8:
+            raise ValueError("A workspace can hold up to eight inputs.")
+        owned = input_items(where="user_id=?", where_args=[user_id])
+        if len(owned) + len(files) > 20:
+            raise ValueError("This demo workspace can hold 20 files. Delete an unused input first.")
+        total_used = sum(item.file_size for item in input_items())
+        user_used = sum(item.file_size for item in owned)
+        for file in files:
+            filename = Path(file.filename or "input").name[:160]
+            ext = Path(filename).suffix.lower()
+            if ext not in (".txt", ".md", ".wav", ".mp3", ".webm", ".m4a", ".ogg", ".png", ".jpg", ".jpeg", ".webp"):
+                raise ValueError("Use a text note, audio recording, PNG, JPEG, or WebP image.")
+            content = await file.read(settings.max_file_bytes + 1)
+            if not content or len(content) > settings.max_file_bytes:
+                raise ValueError("Files must contain data and be no larger than 4 MB.")
+            if total_used + len(content) > settings.max_upload_bytes or user_used + len(content) > settings.max_user_bytes:
+                raise ValueError("The demo's storage allowance is full. Delete unused inputs or try again later.")
+            import shutil
+            if shutil.disk_usage(settings.data_root).free < 32 * 1024 * 1024:
+                raise ValueError("Storage is temporarily unavailable. Your existing inputs are saved.")
+            file_type = "text" if ext in (".txt", ".md") else ("image" if ext in (".png", ".jpg", ".jpeg", ".webp") else "audio")
+            mime_type = {
+                ".txt": "text/plain", ".md": "text/plain", ".png": "image/png",
+                ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp",
+                ".wav": "audio/wav", ".mp3": "audio/mpeg", ".webm": "audio/webm",
+                ".m4a": "audio/mp4", ".ogg": "audio/ogg",
+            }[ext]
+            text = content.decode("utf-8") if file_type == "text" else ""
+            if len(text) > settings.max_text_chars:
+                raise ValueError("A text input can contain up to 12,000 characters.")
+            if file_type == "image":
+                import io
+                from PIL import Image
+                with Image.open(io.BytesIO(content)) as picture:
+                    if picture.width * picture.height > 12000000:
+                        raise ValueError("Please resize this image to 12 megapixels or smaller.")
+                    picture.verify()
+            unique = generate_uuid() + ext
+            folder = "images" if file_type == "image" else file_type
+            target = upload_dir / folder / unique
+            async with aiofiles.open(target, "wb") as stream:
+                await stream.write(content)
             item_id = generate_uuid()
-            
-            # Process text files immediately during upload
-            transcription = ""
-            extracted_data = ""
-            processed = False
-            
-            if file_type == "text":
-                try:
-                    # Read text content immediately
-                    async with aiofiles.open(storage_path, "r") as f:
-                        text_content = await f.read()
-                    transcription = text_content
-                    extracted_data = json.dumps(
-                        await extract_entities_from_text(text_content)
-                    )
-                    processed = True
-                except Exception as e:
-                    transcription = f"Error reading file: {str(e)}"
-                    processed = False
-            
-            input_items.insert(
-                InputItem(
-                    id=item_id,
-                    user_id=user.id,
-                    filename=unique_filename,
-                    original_filename=file.filename,
-                    file_path=str(storage_path),
-                    file_type=file_type,
-                    mime_type=file.content_type,
-                    file_size=len(content),
-                    uploaded_at=get_current_timestamp(),
-                    processed=processed,
-                    transcription=transcription,
-                    extracted_data=extracted_data,
-                )
-            )
-            
-            current_item_ids = json.loads(workspace.input_item_ids or "[]")
-            current_item_ids.append(item_id)
-            workspaces.update({"input_item_ids": json.dumps(current_item_ids)}, workspace_id)
-
-            uploaded_items.append(
-                {
-                    "id": item_id,
-                    "filename": file.filename,
-                    "type": file_type,
-                    "size": len(content),
-                }
-            )
-
-    recent_uploads_update = create_recent_uploads_section(user.id, swap_oob=True)
-    
-    # Get all current workspace items to rebuild the ingested-items div
-    updated_workspace = workspaces[workspace_id]
-    all_item_ids = json.loads(updated_workspace.input_item_ids or "[]")
-    all_items = []
-    if all_item_ids:
-        item_ids_str = "', '".join(all_item_ids)
-        all_items = input_items(where=f"id IN ('{item_ids_str}')")
-    
-    # Rebuild the entire ingested-items div with all items using unified fragment
-    items_content = []
-    for workspace_item in all_items:
-        items_content.append(build_input_item_fragment(workspace_item, workspace_id))
-    
-    # Create the updated ingested-items div
-    updated_ingested_items = Div(
-        *items_content if items_content else [P("No items added yet.", cls=(TextPresets.muted_sm, "italic"))],
-        id="ingested-items",
-        hx_swap_oob="true"
-    )
-    
-    workspace_input = Input(type="hidden", id="current-workspace-id", name="workspace_id", value=workspace_id, hx_swap_oob="true")
-    
-    return updated_ingested_items, recent_uploads_update, workspace_input
+            try:
+                input_items.insert({"id": item_id, "user_id": user_id, "filename": unique,
+                    "original_filename": filename, "file_path": str(target), "file_type": file_type,
+                    "mime_type": mime_type,
+                    "file_size": len(content), "uploaded_at": get_current_timestamp(), "processed": bool(text),
+                    "transcription": text, "extracted_data": "", "text_origin": "user"})
+            except Exception:
+                target.unlink(missing_ok=True)
+                raise
+            ids = json.loads(workspaces[workspace_id].input_item_ids or "[]")
+            workspaces.update({"input_item_ids": json.dumps(ids + [item_id])}, workspace_id)
+            total_used += len(content)
+            user_used += len(content)
+    except (ValueError, UnicodeDecodeError):
+        import sys
+        return upload_fragment(user_id, workspace_id, str(sys.exception()))
+    except Exception:
+        return upload_fragment(user_id, workspace_id, "This file could not be saved. Check its format and try again.")
+    finally:
+        await form.close()
+    return upload_fragment(user_id, workspace_id)
 
 
 @rt("/workspace/{workspace_id}/items")
@@ -798,160 +834,21 @@ def get_workspace_items(workspace_id: str, session):
     )
 
 
-@rt("/process-items")
+@rt("/process-items", methods=["POST"])
 async def process_items(workspace_id: str, session):
-    """Process workspace items with AI (transcription and entity extraction)"""
-    auth = session.get("auth")
-    user = users[auth]
-    workspace = workspaces[workspace_id]
-    item_ids = json.loads(workspace.input_item_ids or "[]")
-    
-    if not item_ids:
-        items = []
-    else:
-        item_ids_str = "', '".join(item_ids)
-        items = input_items(where=f"id IN ('{item_ids_str}')")
-
-    if not items:
-        return {"error": "No items found"}
-
-    processed_count = 0
-    for item in items:
-        if not item.processed:
-            transcription = ""
-            extracted_data = ""
-
-            # Process audio files (text files are processed during upload)
-            if item.file_type == "audio":
-                transcription = await transcribe_audio(item.file_path)
-                if transcription and not transcription.startswith("Error"):
-                    extracted_data = json.dumps(
-                        await extract_entities_from_text(transcription)
-                    )
-
-            # Update item in database
-            input_items.update(
-                {
-                    "transcription": transcription,
-                    "extracted_data": extracted_data,
-                    "processed": True,
-                },
-                item.id,
-            )
-            processed_count += 1
-
-    return {"success": True, "processed": processed_count}
+    workspace = workflow.get_workspace(workspace_id, session["auth"])
+    try:
+        for source in workflow.source_records(workspace):
+            await workflow.prepare_source(source, session["auth"])
+    except (LimitReached, ProviderUnavailable, ValueError) as error:
+        return {"error": str(error)}
+    return {"success": True}
 
 
-@rt("/generate-report")
+@rt("/generate-report", methods=["POST"])
 async def generate_report(workspace_id: str, session):
-    """Generate a maintenance report from workspace items"""
-    auth = session.get("auth")
-    user = users[auth]
-    workspace = workspaces[workspace_id]
-    item_ids = json.loads(workspace.input_item_ids or "[]")
-    
-    if not item_ids:
-        items = []
-    else:
-        item_ids_str = "', '".join(item_ids)
-        items = input_items(where=f"id IN ('{item_ids_str}')")
+    return await workflow.start(workspace_id, session["auth"])
 
-    if not items:
-        return Div(
-            P("No items found in workspace to generate report from."),
-            cls="text-red-600 p-4",
-        )
-
-    await process_items(workspace_id, session)
-
-    workspace = workspaces[workspace_id]
-    item_ids = json.loads(workspace.input_item_ids or "[]")
-    
-    if not item_ids:
-        items = []
-    else:
-        item_ids_str = "', '".join(item_ids)
-        items = input_items(where=f"id IN ('{item_ids_str}')")
-
-    items_data = []
-    for item in items:
-        items_data.append(
-            {
-                "filename": item.original_filename,
-                "type": item.file_type,
-                "transcription": item.transcription,
-                "extracted_data": item.extracted_data,
-            }
-        )
-
-    report_data = await generate_maintenance_report(items_data)
-
-    if "error" in report_data:
-        return Div(
-            H3("Report Generation Failed"),
-            P(f"Error: {report_data['error']}"),
-            cls="p-8 border border-red-500 rounded-lg mt-8 bg-red-50",
-        )
-
-    report_id = generate_uuid()
-    maintenance_reports.insert(
-        MaintenanceReport(
-            id=report_id,
-            workspace_id=workspace_id,
-            user_id=user.id,
-            title=report_data.get("title", "Generated Maintenance Report"),
-            description=report_data.get("description", ""),
-            equipment_id=report_data.get("equipment_id", ""),
-            part_numbers=json.dumps(report_data.get("part_numbers", [])),
-            defect_codes=json.dumps(report_data.get("defect_codes", [])),
-            corrective_action=report_data.get("corrective_action", ""),
-            parts_used=json.dumps(report_data.get("parts_used", [])),
-            next_service_date=report_data.get("next_service_date", ""),
-            priority=report_data.get("priority", "medium"),
-            status="open",
-            created_at=get_current_timestamp(),
-            updated_at=get_current_timestamp(),
-            finalized=False,
-        )
-    )
-
-    return Div(
-        H3("Generated Maintenance Report"),
-        Div(
-            H4(report_data.get("title", "Maintenance Report")),
-            P(Strong("Description: "), report_data.get("description", "N/A")),
-            P(Strong("Equipment ID: "), report_data.get("equipment_id", "N/A")),
-            P(
-                Strong("Priority: "),
-                Span(
-                    report_data.get("priority", "medium").title(),
-                ),
-            ),
-            P(Strong("Part Numbers: "), ", ".join(report_data.get("part_numbers", []))),
-            P(Strong("Defect Codes: "), ", ".join(report_data.get("defect_codes", []))),
-            P(
-                Strong("Corrective Action: "),
-                report_data.get("corrective_action", "N/A"),
-            ),
-            P(Strong("Parts Used: "), ", ".join(report_data.get("parts_used", []))),
-            P(
-                Strong("Next Service Date: "),
-                report_data.get("next_service_date", "N/A"),
-            ),
-            id="report-section",
-        ),
-        Div(
-            Button(
-                "Edit Report",
-                hx_get=f"/content/edit-report/{report_id}",
-                hx_target="#main-content",
-                cls=ButtonT.primary,
-            ),
-            cls="mt-4",
-        ),
-        cls="mt-8 p-4 bg-muted rounded-lg",
-    )
 
 @rt("/content/workspace")
 @rt("/content/workspace/{workspace_id}")
@@ -961,6 +858,8 @@ def content_workspace(session, workspace_id: str = None):
     user = users[auth]
 
     if workspace_id is None:
+        if len(workspaces(where="user_id=?", where_args=[user.id])) >= 10:
+            return Alert("This demo allows ten workspaces. Delete an unused workspace first.", cls=AlertT.error)
         # Create a new workspace
         workspace_id = generate_uuid()
         workspace_name = f"Workspace {datetime.now().strftime('%Y-%m-%d %H:%M')}"
@@ -1079,14 +978,14 @@ def content_workspace(session, workspace_id: str = None):
                         DivVStacked(
                             UkIcon("file-plus", height=32, width=32, cls="mx-auto text-muted-foreground mb-4"),
                             P("Drag and drop files here", cls=TextT.medium),
-                            P("Supports: Audio (.wav, .mp3), Text (.txt), Images (.png, .jpg)", cls=TextPresets.muted_sm),
+                            P("Text, audio, and images · 4 MB per file · two files per upload", cls=TextPresets.muted_sm),
                             P("Or click to select files", cls=TextPresets.muted_sm + " mt-2"),
                             cls="text-center py-8"
                         ),
                         id="workspace-files",
                         name="files",
                         multiple=True,
-                        accept=".wav,.mp3,.txt,.png,.jpg,.jpeg",
+                        accept=".wav,.mp3,.webm,.m4a,.ogg,.txt,.md,.png,.jpg,.jpeg,.webp",
                         data_upload_zone="true",
                     ),
                     Progress(id="upload-progress", value=None, cls="w-full mt-4", hidden=True, aria_label="Uploading files"),
@@ -1345,7 +1244,7 @@ def modal_edit_transcription(item_id: str, session):
         if item.user_id != user.id:
             return Alert("Unauthorized", cls=AlertT.error)
         
-        if item.file_type not in ["audio", "text"]:
+        if item.file_type not in ["audio", "text", "image"]:
             return Alert("Not an audio or text file", cls=AlertT.error)
         
         # Dynamic labels based on file type
@@ -1394,7 +1293,9 @@ def update_transcription(item_id: str, session, transcription: str):
             return Alert("Unauthorized", cls=AlertT.error)
         
         # Update the transcription
-        input_items.update({"transcription": transcription}, item_id)
+        if len(transcription) > settings.max_text_chars:
+            return Alert("Use at most 12,000 characters per input.", cls=AlertT.error)
+        input_items.update({"transcription": transcription, "text_origin": "user_edited"}, item_id)
         
         # Create out-of-band update with proper workspace context
         updated_item = input_items[item_id]
@@ -1419,7 +1320,6 @@ def update_transcription(item_id: str, session, transcription: str):
             hx_swap_oob="true"
         )
         
-        print(updated_article, updated_article.attrs)
         
         return updated_article
         
@@ -1787,11 +1687,12 @@ async def transcribe_audio_item(item_id: str, session, request):
             return Div("Not an audio file")
         
         # Transcribe the audio
-        transcription = await transcribe_audio(item.file_path)
+        transcription = await groq.transcribe(item.file_path, user.id)
         
         # Update the item with transcription
         input_items.update({
             "transcription": transcription,
+            "text_origin": "groq_audio",
             "processed": True
         }, item_id)
         
@@ -2425,6 +2326,11 @@ def content_view_input(input_id: str, session):
     try:
         input_item = input_items[input_id]
         
+        if settings.demo:
+            return Container(H1(input_item.original_filename), build_input_item_fragment(input_item),
+                Textarea(input_item.transcription or "", name="transcription", maxlength=settings.max_text_chars,
+                         hx_put=f"/update-transcription/{input_item.id}", hx_trigger="change", hx_swap="none",
+                         cls="w-full mt-4", rows=10), Div(id="modal-container"), cls=ContainerT.lg)
         # Build transcription section based on file type and transcription status
         transcription_section = None
         if input_item.file_type == "audio":
@@ -2707,6 +2613,8 @@ def content_view_report(report_id: str, session):
     user = users[auth]
     try:
         report = maintenance_reports[report_id]
+        if report.evidence_json:
+            return evidence_report_view(report)
 
         return Container(
             Section(
@@ -2773,6 +2681,8 @@ def content_edit_report(report_id: str, session):
     user = users[auth]
     try:
         report = maintenance_reports[report_id]
+        if report.evidence_json:
+            return evidence_report_editor(report)
 
         return Container(
             Section(
@@ -2886,129 +2796,17 @@ def content_edit_report(report_id: str, session):
     except:
         return Div("Report not found")
 
-@rt("/content/generate-report")
+@rt("/content/generate-report", methods=["POST"])
 async def content_generate_report(workspace_id: str, session):
-    """Generate a maintenance report from workspace items and return content fragment"""
-    auth = session.get("auth")
-    user = users[auth]
-    workspace = workspaces[workspace_id]
-    item_ids = json.loads(workspace.input_item_ids or "[]")
-    
-    if not item_ids:
-        items = []
-    else:
-        item_ids_str = "', '".join(item_ids)
-        items = input_items(where=f"id IN ('{item_ids_str}')")
+    return await workflow.start(workspace_id, session["auth"])
 
-    if not items:
-        return Div(
-            H1("Report Generation Failed"),
-            P("No items found in workspace to generate report from."),
-            Button(
-                "Back to Workspace",
-                hx_get="/content/workspace",
-                hx_target="#main-content",
-                cls=ButtonT.primary,
-            ),
-        )
 
-    await process_items(workspace_id, session)
-
-    workspace = workspaces[workspace_id]
-    item_ids = json.loads(workspace.input_item_ids or "[]")
-    
-    if not item_ids:
-        items = []
-    else:
-        item_ids_str = "', '".join(item_ids)
-        items = input_items(where=f"id IN ('{item_ids_str}')")
-
-    items_data = []
-    for item in items:
-        items_data.append(
-            {
-                "filename": item.original_filename,
-                "type": item.file_type,
-                "transcription": item.transcription,
-                "extracted_data": item.extracted_data,
-            }
-        )
-
-    report_data = await generate_maintenance_report(items_data)
-
-    if "error" in report_data:
-        return Div(
-            H1("Report Generation Failed"),
-            P(f"Error: {report_data['error']}"),
-            Button(
-                "Back to Workspace",
-                hx_get="/content/workspace",
-                hx_target="#main-content",
-                cls=ButtonT.primary,
-            ),
-        )
-
-    report_id = generate_uuid()
-    maintenance_reports.insert(
-        MaintenanceReport(
-            id=report_id,
-            workspace_id=workspace_id,
-            user_id=user.id,
-            title=report_data.get("title", "Generated Maintenance Report"),
-            description=report_data.get("description", ""),
-            equipment_id=report_data.get("equipment_id", ""),
-            part_numbers=json.dumps(report_data.get("part_numbers", [])),
-            defect_codes=json.dumps(report_data.get("defect_codes", [])),
-            corrective_action=report_data.get("corrective_action", ""),
-            parts_used=json.dumps(report_data.get("parts_used", [])),
-            next_service_date=report_data.get("next_service_date", ""),
-            priority=report_data.get("priority", "medium"),
-            status="open",
-            created_at=get_current_timestamp(),
-            updated_at=get_current_timestamp(),
-            finalized=False,
-        )
-    )
-
-    main_content = Div(
-        H1("Generated Maintenance Report"),
-        Div(
-            H2(report_data.get("title", "Maintenance Report")),
-            P(Strong("Description: "), report_data.get("description", "N/A")),
-            P(Strong("Equipment ID: "), report_data.get("equipment_id", "N/A")),
-            P(
-                Strong("Priority: "),
-                Span(
-                    report_data.get("priority", "medium").title(),
-                ),
-            ),
-            P(Strong("Part Numbers: "), ", ".join(report_data.get("part_numbers", []))),
-            P(Strong("Defect Codes: "), ", ".join(report_data.get("defect_codes", []))),
-            P(
-                Strong("Corrective Action: "),
-                report_data.get("corrective_action", "N/A"),
-            ),
-            P(Strong("Parts Used: "), ", ".join(report_data.get("parts_used", []))),
-            P(
-                Strong("Next Service Date: "),
-                report_data.get("next_service_date", "N/A"),
-            ),
-            cls="report-section",
-        ),
-        Div(
-            Button(
-                "Edit Report",
-                hx_get=f"/content/edit-report/{report_id}",
-                hx_target="#main-content",
-                cls=ButtonT.primary,
-            ),
-        ),
-    )
-
-    recent_reports_update = create_recent_reports_section(user.id, swap_oob=True)
-    dashboard_stats_update = create_dashboard_stats_section(user.id, swap_oob=True)
-
-    return main_content, recent_reports_update, dashboard_stats_update
+@rt("/generation/{generation_id}")
+def poll_generation(generation_id: str, session):
+    view = workflow.poll(generation_id, session["auth"])
+    if generations[generation_id].status == "done":
+        return view, create_recent_reports_section(session["auth"], swap_oob=True), create_dashboard_stats_section(session["auth"], swap_oob=True)
+    return view
 
 
 @rt("/update-report-content/{report_id}")
@@ -3018,6 +2816,16 @@ async def update_report_content(report_id:str, session, request):
     
     # Parse form data
     form_data = await request.form()
+    report = maintenance_reports[report_id]
+    if report.evidence_json:
+        status = form_data.get("status", "open")
+        if status not in ("open", "in_progress", "completed", "closed"):
+            raise HTTPException(400, "Invalid status")
+        maintenance_reports.update({"title": str(form_data.get("title", report.title))[:160],
+                                    "review_notes": str(form_data.get("review_notes", ""))[:6000],
+                                    "status": status, "updated_at": get_current_timestamp()}, report_id)
+        return content_view_report(report_id, session), create_recent_reports_section(user.id, swap_oob=True)
+
     title = form_data.get("title", "")
     description = form_data.get("description", "")
     equipment_id = form_data.get("equipment_id", "")
@@ -3029,7 +2837,6 @@ async def update_report_content(report_id:str, session, request):
     next_service_date = form_data.get("next_service_date", "")
     
     # Debug: print the received priority value
-    print(f"DEBUG: Received priority value: '{priority}' (type: {type(priority)})")
     
     try:
         part_numbers_list = [p.strip() for p in part_numbers.split(",") if p.strip()]
@@ -3145,7 +2952,7 @@ def update_workspace(workspace_id: str, session, updates: dict):
             return Alert("Unauthorized", cls=AlertT.error)
         
         # Always update the timestamp
-        updates["updated_at"] = get_current_timestamp()
+        updates = {"name": str(updates.get("name", workspace.name))[:160], "updated_at": get_current_timestamp()}
         
         # Update the workspace
         workspaces.update(updates, workspace_id)
@@ -3186,6 +2993,125 @@ def delete_workspace(workspace_id: str, session, source: str = None):
 def logout(session):
     session.clear()
     return RedirectResponse("/", status_code=303)
+
+
+def demo_landing():
+    return (
+        Title("Frontline — evidence-backed maintenance reports"),
+        Container(
+            Div(
+                Small("FRONTLINE · INTERACTIVE DEMO", cls=TextPresets.muted_sm),
+                H1("Field notes become reports you can check."),
+                P("Bring together written notes, recordings, and images. Review what was observed, what was done, and what still needs an answer."),
+                P("Each finding points to its source. Missing information stays visible."),
+                Form(Button("Explore the demo", type="submit", cls=ButtonT.primary),
+                     action="/demo/start", method="post"),
+                P("Start with a synthetic inspection. Your separate demo workspace lasts 24 hours.",
+                  cls=TextPresets.muted_sm),
+                cls="demo-intro space-y-6",
+            ),
+            cls=ContainerT.lg,
+        ),
+    )
+
+
+_last_cleanup = 0
+
+
+def cleanup_demo():
+    global _last_cleanup
+    if not settings.demo or time.time() - _last_cleanup < 300:
+        return
+    _last_cleanup = time.time()
+    cutoff = datetime.now(timezone.utc).isoformat()
+    for user in users(where="demo_expires_at<>'' AND demo_expires_at<?", where_args=[cutoff]):
+        for item in input_items(where="user_id=?", where_args=[user.id]):
+            path = Path(item.file_path).resolve()
+            if path.is_relative_to(upload_dir):
+                path.unlink(missing_ok=True)
+            input_items.delete(item.id)
+        for report in maintenance_reports(where="user_id=?", where_args=[user.id]):
+            for annotation in report_annotations(where="report_id=?", where_args=[report.id]):
+                report_annotations.delete(annotation.id)
+            maintenance_reports.delete(report.id)
+        for table in (generations, workspaces):
+            for row in table(where="user_id=?", where_args=[user.id]):
+                table.delete(row.id)
+        users.delete(user.id)
+
+
+@rt("/demo/start", methods=["POST"])
+def start_demo(request, session):
+    if not settings.demo:
+        raise HTTPException(404)
+    cleanup_demo()
+    if session.get("auth"):
+        try:
+            existing = users[session["auth"]]
+            if existing.demo_expires_at > datetime.now(timezone.utc).isoformat() and session.get("visitor") == existing.username:
+                return RedirectResponse("/", status_code=303)
+        except Exception:
+            session.clear()
+    try:
+        actor = budget.actor_for_ip(request.client.host if request.client else "unknown", settings.session_key)
+        budget.reserve(actor, "session")
+    except LimitReached:
+        return Titled("Demo temporarily busy", P("The demo has reached its visitor allowance. Please try again later."))
+    now = datetime.now(timezone.utc)
+    visitor = "visitor-" + secrets.token_hex(8)
+    user = users.insert({
+        "id": secrets.randbits(52) + 1,
+        "username": visitor, "email": visitor + "@example.invalid",
+        "password_hash": secrets.token_hex(32), "created_at": now.isoformat(), "active": True,
+        "demo_expires_at": (now + timedelta(hours=24)).isoformat(),
+    })
+    example = json.loads((Path(__file__).resolve().parent / "demo-data/sample-report.json").read_text())
+    workspace_id = generate_uuid()
+    item_ids = []
+    for source in example["sources"]:
+        item_id = generate_uuid()
+        filename = item_id + ".txt"
+        path = upload_dir / "text" / filename
+        path.write_text(source["text"])
+        input_items.insert({
+            "id": item_id, "user_id": user.id, "filename": filename,
+            "original_filename": source["filename"], "file_path": str(path), "file_type": "text",
+            "mime_type": "text/plain", "file_size": path.stat().st_size, "uploaded_at": now.isoformat(),
+            "processed": True, "transcription": source["text"], "extracted_data": "", "text_origin": "synthetic",
+        })
+        item_ids.append(item_id)
+    workspaces.insert({
+        "id": workspace_id, "user_id": user.id, "name": "Pump P-17 inspection",
+        "created_at": now.isoformat(), "updated_at": now.isoformat(), "status": "draft",
+        "input_item_ids": json.dumps(item_ids),
+    })
+    report_id = workflow.save_report(workspaces[workspace_id], example["sources"], example["report"],
+                                     {"model": example["model"]}, title="Pump P-17 — saved example")
+    maintenance_reports.update({"created_at": example["generated_at"],
+                                "review_notes": "Saved example generated from synthetic notes. It is copied into your workspace without making a new AI request."}, report_id)
+    session["auth"] = user.id
+    session["visitor"] = visitor
+    return RedirectResponse("/", status_code=303)
+
+
+@rt("/describe-image/{item_id}", methods=["POST"])
+async def describe_image(item_id: str, session):
+    item = input_items[item_id]
+    if item.file_type != "image":
+        raise HTTPException(400, "Not an image")
+    try:
+        text = await groq.describe(item.file_path, session["auth"])
+        input_items.update({"transcription": text, "text_origin": "groq_image", "processed": True}, item.id)
+        return build_input_item_fragment(input_items[item_id])
+    except (LimitReached, ProviderUnavailable) as error:
+        return Div(build_input_item_fragment(item), P(str(error), role="alert"))
+
+
+@rt("/healthz")
+def healthz():
+    db.q("SELECT 1")
+    return {"status": "ok"}
+
 
 if __name__ == "__main__":
     serve()
