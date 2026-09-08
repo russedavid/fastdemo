@@ -176,6 +176,15 @@ class HostingTests(unittest.TestCase):
         self.assertIn("Read the original documentation", page)
         self.assertNotIn("No completed work is established", page)
         self.assertEqual(json.loads(job.retrieval_json)["corpus_sha256"], trace["corpus_sha256"])
+        # A model can omit reference-only claims. Preserve its output while exposing the actual retrieved passages.
+        report_data = json.loads(report.evidence_json)
+        report_data["observations"] = [report_data["observations"][0]]
+        self.app.maintenance_reports.update({"evidence_json": json.dumps(report_data)}, report.id)
+        page = self.client.get("/content/view-report/" + report.id).text
+        self.assertIn("Reference guidance", page)
+        self.assertIn("Retrieved passages, shown directly from the saved sources.", page)
+        self.assertIn("50 degrees Celsius", page)
+        self.assertEqual(json.loads(self.app.maintenance_reports[report.id].evidence_json), report_data)
 
     def test_expired_demo_removes_only_that_visitors_data(self):
         from starlette.testclient import TestClient

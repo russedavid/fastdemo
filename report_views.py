@@ -44,6 +44,12 @@ def evidence_report_view(record):
     def reference_only(item):
         return bool(item["source_ids"]) and set(item["source_ids"]) <= reference_ids
 
+    reference_claims = [o for o in report["observations"] if reference_only(o)]
+    direct_reference_passages = bool(reference_ids) and not reference_claims
+    if direct_reference_passages:
+        reference_claims = [{"text": source["text"], "source_ids": [source["id"]]}
+                            for source in sources if source["id"] in reference_ids]
+
     def citations(ids):
         return [A(f"[{source_numbers[source_id]}]", href=f"#source-{source_numbers[source_id]}",
                   cls="source-citation", title="Read supporting source") for source_id in ids]
@@ -110,7 +116,8 @@ def evidence_report_view(record):
            "context_budget": "The source packet was full, so reference passages were left out."}.get(retrieval.get("status"), ""),
           cls=TextPresets.muted_sm) if retrieval.get("status") not in (None, "disabled") else None,
         claims("Observations", [o for o in report["observations"] if not reference_only(o)], "No observations recorded."),
-        claims("Reference guidance", [o for o in report["observations"] if reference_only(o)], "") if any(reference_only(o) for o in report["observations"]) else None,
+        P("Retrieved passages, shown directly from the saved sources.", cls=TextPresets.muted_sm) if direct_reference_passages else None,
+        claims("Reference guidance", reference_claims, "") if reference_claims else None,
         claims("Completed work", report["completed_work"], "No completed-work entries in this draft. Check the observations and sources."),
         Card(CardHeader(H3("Parts used")), CardBody(parts_body), body_cls="p-0", cls="mb-4"),
         claims("Proposed actions", report["proposed_actions"], "No proposed actions recorded."),

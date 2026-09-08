@@ -10,7 +10,7 @@ The first library is deliberately narrow: nine summaries from two pinned manufac
 2. Look for a supported model in written or user-edited notes. Competing model/revision mentions, obvious uncertainty, and unreviewed media interpretations do not establish retrieval context. This is a conservative text heuristic, not a general entity resolver or physical verification.
 3. Search an indexed corpus using SQLite FTS5 and BM25. Require current documents, matching model/revision, and public or matching-owner access before selecting the top passages. Queries mentioning recognized components must match at least one of them, preventing a fan question from returning a generic temperature passage solely because of a shared word.
 4. Add at most two whole passages within the existing source-character budget. Record source versions, scores, selected IDs, context exclusions, and retrieval time. Keep the complete augmented source snapshot with the report.
-5. Generate and validate the report. Reference-only citations cannot establish completed work, installed part identifiers, or an assigned priority/service date. Claims based solely on references appear in a separate guidance section. These code checks do not prove every sentence is semantically supported.
+5. Generate and validate the report. Reference-only citations cannot establish completed work, installed part identifiers, or an assigned priority/service date. Claims based solely on references appear in a separate guidance section. If the model omits those claims, the viewer displays the saved reference passages directly and labels them accordingly; the model's saved output stays unchanged. These code checks do not prove every sentence is semantically supported.
 
 The curated library is public. Owner and revocation filters are exercised with fictional private evaluation fixtures; the app does not yet provide a private-manual upload workflow. Content selected for a report remains under the report's existing ownership checks. A frozen historical report retains its source snapshot when the current index changes; revocation prevents future retrieval, not retroactive erasure of earlier reports.
 
@@ -29,6 +29,8 @@ The actual alwaysdata Python environment supports FTS5 and JSON functions on SQL
 Twenty assistant-authored retrieval cases compare keyword overlap, BM25, and an offline BM25 ablation that removes model/revision applicability. Access and revocation checks remain enabled in every method. There are 12 answerable cases and eight cases where the corpus cannot supply applicable, authorized guidance. These are development relevance labels, not human-adjudicated or held-out measurements.
 
 The initial run returned generic temperature passages for a Pi 4 fan-threshold question. A component-match requirement corrected that error. Both runs are retained; the second uses the same cases after that development fix.
+
+A public smoke check also exposed a display assumption: retrieval succeeded, but the model sometimes omitted a guidance summary. The report viewer now shows the saved reference passages when a summary is absent. This is a deterministic display improvement, not a claim that the model used the references correctly in every generation.
 
 | Revised comparison | Relevant top result, answerable cases | Macro recall at 2 | Macro precision at 2, answerable cases | Correct abstentions | Wrong-applicability passages |
 |---|---:|---:|---:|---:|---:|
