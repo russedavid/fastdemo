@@ -1,0 +1,19 @@
+{
+  "status": "provisional_assistant_derived_after_open_notes",
+  "categories": [
+    {"id": "missing_as_none", "title": "Unrecorded parts use becomes explicit no parts use", "review_numbers": [6, 9, 12, 18, 23, 31, 34, 36, 38]},
+    {"id": "unsupported_action", "title": "An unsupported recommendation or directive is added", "review_numbers": [12, 14, 17, 23, 25, 29]},
+    {"id": "omitted_completed_check", "title": "A performed technician check is omitted from completed work", "review_numbers": [5, 7, 9, 11, 23, 30, 31, 36]},
+    {"id": "unusable_report", "title": "Generation fails provider or application validation", "review_numbers": [4, 19]},
+    {"id": "unknown_quantity_state", "title": "Unknown quantity incorrectly makes known installation unknown", "review_numbers": [4]},
+    {"id": "damaged_measurement", "title": "Control characters corrupt reference units or ranges", "review_numbers": [18, 34]}
+  ],
+  "first_failure": {
+    "4": "unknown_quantity_state", "5": "omitted_completed_check", "6": "missing_as_none", "7": "omitted_completed_check",
+    "9": "missing_as_none", "11": "omitted_completed_check", "12": "unsupported_action", "14": "unsupported_action",
+    "17": "unsupported_action", "18": "missing_as_none", "19": "unusable_report", "23": "unsupported_action",
+    "25": "unsupported_action", "29": "unsupported_action", "30": "omitted_completed_check", "31": "missing_as_none",
+    "34": "missing_as_none", "36": "missing_as_none", "38": "missing_as_none"
+  },
+  "counting_note": "Categories overlap. The first-failure column counts one principal finding per failed trace; it is not a claim that all implementation root causes are known."
+}

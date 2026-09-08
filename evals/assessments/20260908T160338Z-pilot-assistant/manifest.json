@@ -1,0 +1,26 @@
+{
+  "run_id": "20260908T160338Z-pilot",
+  "assessment_id": "20260908T160338Z-pilot-assistant",
+  "recorded_at": "2026-09-08T21:51:52.533807+00:00",
+  "authorization": "The project owner asked the assistant to review all 40 outputs and use its judgment for now.",
+  "reviewer": "codex-interactive-review",
+  "reviewer_kind": "assistant",
+  "criteria_version": "assistant-v1",
+  "reviewed_traces": 40,
+  "independent_situations": 20,
+  "human_reviewed_traces": 0,
+  "generator_model": "qwen/qwen3.8-27b",
+  "method": "Source-based reading of every output; open critiques; paired consistency pass; then provisional failure categories. No extra provider calls.",
+  "prior_exposure": "The assistant participated in development and corpus authoring. Variant labels and provisional references were omitted from the initial reading, but this is not an independent or blinded evaluation.",
+  "reference_status": "Provisional assistant labels; not human gold labels or judge calibration evidence.",
+  "split": "development",
+  "artifacts": {
+    "rubric.md": "250fdf9745663b06998eb9a53efe53b66985f3d432753de10071bc067a23dbf9",
+    "taxonomy.json": "3b30f80a89229645f1a24d8fc293b2e44334f6ac06b09a933b813ecdd6b0d230",
+    "open-notes.jsonl": "7fc63d803893e02229ebd3a16434ac135a6b25bd67b12441e02ef946af15d28f",
+    "revisions.jsonl": "405503b1580ef03d508b316276b89d4a075dc032168f369b0129894d46ede8fd",
+    "reviews.jsonl": "430bdfe3284c1794e79b678c7104abfc5c5777dca51a035b1348015f684fea6b",
+    "report_views.py.snapshot": "6a4ac7b072226dccecb03b31663856a947e5f2cf2134aefde1ae775ded739db2"
+  },
+  "application_display_revision": "acb32e4"
+}

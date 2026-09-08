@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frontline — trace review</title>
+<style>
+:root{color-scheme:light;font:16px/1.5 system-ui,sans-serif;color:#392f27;background:#f6f1e9}
+*{box-sizing:border-box}body{margin:0}header{padding:1rem 2rem;border-bottom:1px solid #d9caba;background:#e9ddcc}
+h1{font-size:1.6rem;margin:0}h2{font-size:1.2rem;margin:.2rem 0 1rem}h3{font-size:1rem;margin:1rem 0 .4rem}
+p{margin:.4rem 0 1rem}.muted{color:#665b52;font-size:.88rem}button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:1px solid #b49c83;border-radius:6px;padding:.5rem .9rem;background:#fcfaf6;color:inherit}
+button.primary,button[aria-pressed=true]{background:#79583d;color:white;border-color:#79583d}button:disabled{opacity:.5;cursor:default}
+input,textarea,select{border:1px solid #c9b8a6;border-radius:5px;padding:.5rem;background:#fffdf9;color:inherit}
+textarea{width:100%;min-height:7rem}label{display:flex;flex-direction:column;gap:.25rem}
+.toolbar{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;padding:.8rem 2rem}
+main{padding:0 2rem 2rem}.columns{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
+.panel{background:#fcfaf7;border:1px solid #d9caba;border-radius:8px;padding:1.2rem;min-width:0}
+.columns>.panel{max-height:58vh;overflow:auto}
+.source{border-bottom:1px solid #e5dace;padding-bottom:1rem;margin-bottom:1rem}.source:last-child{border:0;margin:0}
+.source-text,pre{white-space:pre-wrap;overflow-wrap:anywhere}pre{font:12px/1.45 ui-monospace,monospace;max-height:24rem;overflow:auto}
+.citation{font-size:.8rem;color:#765438}ul{padding-left:1.25rem}.review{margin-top:1rem}.row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.error{color:#9e3028}#status{min-height:1.5rem}progress{accent-color:#79583d;width:12rem}
+details{margin-top:1rem}summary{cursor:pointer}#report>section+section{border-top:1px solid #e5dace;margin-top:.8rem}
+@media(max-width:800px){.columns{grid-template-columns:1fr}.columns>.panel{max-height:none}header,.toolbar,main{padding-left:1rem;padding-right:1rem}}
+</style>
+<header>
+<h1>Frontline trace review</h1>
+<p>Read the sources and report. Did it produce a faithful maintenance record?</p>
+<div class="muted">Write what you notice in your own words, starting with the first failure. Initial review hides suggested labels and variant names.</div>
+<p id="assessment-link" hidden><a href="/assessment">Read the assistant assessment</a></p>
+</header>
+<div class="toolbar">
+<label>Your name <input id="reviewer" autocomplete="name" maxlength="100"></label>
+<label>Criteria version <input id="criteria" value="open-v1" maxlength="80"></label>
+<button id="previous">Previous</button><button id="next">Next / skip</button>
+<button id="refresh">Refresh traces</button><a href="/export">Export reviews</a>
+<span id="progress-text"></span><progress id="progress" max="40" value="0"></progress>
+</div>
+<main>
+<p id="position" class="muted"></p>
+<div class="columns">
+<section class="panel"><h2>Sources</h2><div id="sources"></div></section>
+<section class="panel"><h2>Generated report</h2><p class="muted">Model output before validation. Rejected outputs are included for diagnosis.</p><div id="report"></div></section>
+</div>
+<section class="panel review">
+<h2>Your judgment</h2>
+<div class="row"><button id="pass" aria-pressed="false">Pass</button><button id="fail" aria-pressed="false">Fail</button>
+<span class="muted">P / F to choose · N / B to navigate when not typing</span></div>
+<label>What worked or went wrong?
+<textarea id="critique" maxlength="6000" placeholder="Use a short, concrete explanation. Point to the relevant source or output."></textarea></label>
+<div class="row"><button id="save" class="primary">Save and next</button><span id="status" role="status" aria-live="polite"></span></div>
+<p class="muted">Skip leaves a trace unreviewed. Reviews are saved locally with their history. If your standard changes, use a new criteria version.</p>
+</section>
+<details><summary>Full trace and technical details</summary><pre id="trace"></pre></details>
+</main>
+<script src="/review.js"></script>
+</html>
