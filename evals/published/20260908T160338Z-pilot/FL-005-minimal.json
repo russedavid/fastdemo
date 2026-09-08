@@ -1,0 +1,554 @@
+{
+  "trace_id": "FL-005-minimal",
+  "case_id": "FL-005",
+  "variant": "minimal",
+  "input_sources": [
+    {
+      "id": "FL-005-N1",
+      "text": "Unit AX-06, controller revision B as printed on the label. Code E14 appeared after a power cycle. I have not tried a remedy and no parts were fitted.",
+      "type": "field_note"
+    },
+    {
+      "applies_to_revision": "B",
+      "id": "FL-005-MB",
+      "text": "Controller revision B, entry E14: clock synchronization warning. Record the code and request diagnostic review. This entry does not assign a severity level, specify a replacement part, or set a next service date.",
+      "type": "fictional_manual_excerpt",
+      "uploaded_at": "2026-08-01"
+    },
+    {
+      "applies_to_revision": "A",
+      "id": "FL-005-MA",
+      "text": "Controller revision A only, entry E14: cooling fan failure. Replace fan FN-12. This entry does not apply to revision B.",
+      "type": "fictional_manual_excerpt",
+      "uploaded_at": "2026-08-20"
+    }
+  ],
+  "request": {
+    "model": "qwen/qwen3.8-27b",
+    "temperature": 0.3,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Write a faithful maintenance report from the supplied source packet. Summarize the important observations, work performed, parts used, proposed actions, and unresolved information. Cite the source IDs for the information you report. Use the supplied JSON schema and return only the JSON object.\n"
+      },
+      {
+        "role": "user",
+        "content": "SOURCE PACKET\n{\"id\": \"FL-005-N1\", \"type\": \"field_note\"}\nUnit AX-06, controller revision B as printed on the label. Code E14 appeared after a power cycle. I have not tried a remedy and no parts were fitted.\n\n{\"id\": \"FL-005-MB\", \"type\": \"fictional_manual_excerpt\", \"applies_to_revision\": \"B\", \"uploaded_at\": \"2026-08-01\"}\nController revision B, entry E14: clock synchronization warning. Record the code and request diagnostic review. This entry does not assign a severity level, specify a replacement part, or set a next service date.\n\n{\"id\": \"FL-005-MA\", \"type\": \"fictional_manual_excerpt\", \"applies_to_revision\": \"A\", \"uploaded_at\": \"2026-08-20\"}\nController revision A only, entry E14: cooling fan failure. Replace fan FN-12. This entry does not apply to revision B.\n\nRESPONSE JSON SCHEMA\n{\"$defs\":{\"Claim\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-005-N1\",\"FL-005-MB\",\"FL-005-MA\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"text\",\"source_ids\"],\"title\":\"Claim\",\"type\":\"object\"},\"EvidenceValue\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-005-N1\",\"FL-005-MB\",\"FL-005-MA\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"EvidenceValue\",\"type\":\"object\"},\"Part\":{\"additionalProperties\":false,\"properties\":{\"part_number\":{\"minLength\":1,\"title\":\"Part Number\",\"type\":\"string\"},\"quantity\":{\"anyOf\":[{\"exclusiveMinimum\":0,\"type\":\"integer\"},{\"type\":\"null\"}],\"title\":\"Quantity\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-005-N1\",\"FL-005-MB\",\"FL-005-MA\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"part_number\",\"quantity\",\"source_ids\"],\"title\":\"Part\",\"type\":\"object\"},\"PartsUsed\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"none\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"items\":{\"items\":{\"$ref\":\"#/$defs/Part\"},\"title\":\"Items\",\"type\":\"array\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-005-N1\",\"FL-005-MB\",\"FL-005-MA\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"items\",\"source_ids\"],\"title\":\"PartsUsed\",\"type\":\"object\"},\"Priority\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"enum\":[\"low\",\"medium\",\"high\",\"critical\"],\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-005-N1\",\"FL-005-MB\",\"FL-005-MA\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"Priority\",\"type\":\"object\"},\"ProposedAction\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-005-N1\",\"FL-005-MB\",\"FL-005-MA\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"},\"basis\":{\"enum\":[\"source\",\"clarification\"],\"title\":\"Basis\",\"type\":\"string\"}},\"required\":[\"text\",\"source_ids\",\"basis\"],\"title\":\"ProposedAction\",\"type\":\"object\"},\"ServiceDate\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-005-N1\",\"FL-005-MB\",\"FL-005-MA\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"ServiceDate\",\"type\":\"object\"},\"Uncertainty\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-005-N1\",\"FL-005-MB\",\"FL-005-MA\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"},\"field\":{\"enum\":[\"equipment_id\",\"parts_used\",\"priority\",\"next_service_date\",\"other\"],\"title\":\"Field\",\"type\":\"string\"}},\"required\":[\"text\",\"source_ids\",\"field\"],\"title\":\"Uncertainty\",\"type\":\"object\"}},\"additionalProperties\":false,\"properties\":{\"equipment_id\":{\"$ref\":\"#/$defs/EvidenceValue\",\"description\":\"Exact equipment identifier copied verbatim. Put revision, location, and explanatory text in observations, not in this value.\"},\"observations\":{\"items\":{\"$ref\":\"#/$defs/Claim\"},\"minItems\":1,\"title\":\"Observations\",\"type\":\"array\"},\"completed_work\":{\"items\":{\"$ref\":\"#/$defs/Claim\"},\"title\":\"Completed Work\",\"type\":\"array\"},\"parts_used\":{\"$ref\":\"#/$defs/PartsUsed\"},\"proposed_actions\":{\"items\":{\"$ref\":\"#/$defs/ProposedAction\"},\"title\":\"Proposed Actions\",\"type\":\"array\"},\"uncertainties\":{\"items\":{\"$ref\":\"#/$defs/Uncertainty\"},\"title\":\"Uncertainties\",\"type\":\"array\"},\"priority\":{\"$ref\":\"#/$defs/Priority\"},\"next_service_date\":{\"$ref\":\"#/$defs/ServiceDate\"}},\"required\":[\"equipment_id\",\"observations\",\"completed_work\",\"parts_used\",\"proposed_actions\",\"uncertainties\",\"priority\",\"next_service_date\"],\"title\":\"Report\",\"type\":\"object\"}"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "frontline_report",
+        "strict": true,
+        "schema": {
+          "$defs": {
+            "Claim": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-005-N1",
+                      "FL-005-MB",
+                      "FL-005-MA"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids"
+              ],
+              "title": "Claim",
+              "type": "object"
+            },
+            "EvidenceValue": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-005-N1",
+                      "FL-005-MB",
+                      "FL-005-MA"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "EvidenceValue",
+              "type": "object"
+            },
+            "Part": {
+              "additionalProperties": false,
+              "properties": {
+                "part_number": {
+                  "minLength": 1,
+                  "title": "Part Number",
+                  "type": "string"
+                },
+                "quantity": {
+                  "anyOf": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Quantity"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-005-N1",
+                      "FL-005-MB",
+                      "FL-005-MA"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "part_number",
+                "quantity",
+                "source_ids"
+              ],
+              "title": "Part",
+              "type": "object"
+            },
+            "PartsUsed": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "none",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "items": {
+                  "items": {
+                    "$ref": "#/$defs/Part"
+                  },
+                  "title": "Items",
+                  "type": "array"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-005-N1",
+                      "FL-005-MB",
+                      "FL-005-MA"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "items",
+                "source_ids"
+              ],
+              "title": "PartsUsed",
+              "type": "object"
+            },
+            "Priority": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-005-N1",
+                      "FL-005-MB",
+                      "FL-005-MA"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "Priority",
+              "type": "object"
+            },
+            "ProposedAction": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-005-N1",
+                      "FL-005-MB",
+                      "FL-005-MA"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                },
+                "basis": {
+                  "enum": [
+                    "source",
+                    "clarification"
+                  ],
+                  "title": "Basis",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids",
+                "basis"
+              ],
+              "title": "ProposedAction",
+              "type": "object"
+            },
+            "ServiceDate": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-005-N1",
+                      "FL-005-MB",
+                      "FL-005-MA"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "ServiceDate",
+              "type": "object"
+            },
+            "Uncertainty": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-005-N1",
+                      "FL-005-MB",
+                      "FL-005-MA"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                },
+                "field": {
+                  "enum": [
+                    "equipment_id",
+                    "parts_used",
+                    "priority",
+                    "next_service_date",
+                    "other"
+                  ],
+                  "title": "Field",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids",
+                "field"
+              ],
+              "title": "Uncertainty",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "equipment_id": {
+              "$ref": "#/$defs/EvidenceValue",
+              "description": "Exact equipment identifier copied verbatim. Put revision, location, and explanatory text in observations, not in this value."
+            },
+            "observations": {
+              "items": {
+                "$ref": "#/$defs/Claim"
+              },
+              "minItems": 1,
+              "title": "Observations",
+              "type": "array"
+            },
+            "completed_work": {
+              "items": {
+                "$ref": "#/$defs/Claim"
+              },
+              "title": "Completed Work",
+              "type": "array"
+            },
+            "parts_used": {
+              "$ref": "#/$defs/PartsUsed"
+            },
+            "proposed_actions": {
+              "items": {
+                "$ref": "#/$defs/ProposedAction"
+              },
+              "title": "Proposed Actions",
+              "type": "array"
+            },
+            "uncertainties": {
+              "items": {
+                "$ref": "#/$defs/Uncertainty"
+              },
+              "title": "Uncertainties",
+              "type": "array"
+            },
+            "priority": {
+              "$ref": "#/$defs/Priority"
+            },
+            "next_service_date": {
+              "$ref": "#/$defs/ServiceDate"
+            }
+          },
+          "required": [
+            "equipment_id",
+            "observations",
+            "completed_work",
+            "parts_used",
+            "proposed_actions",
+            "uncertainties",
+            "priority",
+            "next_service_date"
+          ],
+          "title": "Report",
+          "type": "object"
+        }
+      }
+    },
+    "max_completion_tokens": 768,
+    "reasoning_effort": "none"
+  },
+  "request_sha256": "3accaac92065f21b000abbec73d8a39f295b92537cf449859d069299bba4597d",
+  "source_sha256": "8f105da44350df5c6a7beab639cbae3b1e1d67615a45ec42e93527880eb85f70",
+  "started_at": "2026-09-08T16:13:23.932161+00:00",
+  "elapsed_seconds": 1.2578,
+  "http_status": 200,
+  "response_body": "{\"id\":\"chatcmpl-08012e83-c756-4f4e-9ffe-eb0515ab9390\",\"object\":\"chat.completion\",\"created\":1788884005,\"model\":\"qwen/qwen3.8-27b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"completed_work\\\": [], \\\"equipment_id\\\": {\\\"source_ids\\\": [\\\"FL-005-N1\\\"], \\\"state\\\": \\\"known\\\", \\\"value\\\": \\\"AX-06\\\"}, \\\"next_service_date\\\": {\\\"source_ids\\\": [\\\"FL-005-MB\\\"], \\\"state\\\": \\\"unknown\\\", \\\"value\\\": null}, \\\"observations\\\": [{\\\"source_ids\\\": [\\\"FL-005-N1\\\"], \\\"text\\\": \\\"The unit is identified as AX-06 with controller revision B, as printed on the label.\\\"}, {\\\"source_ids\\\": [\\\"FL-005-N1\\\"], \\\"text\\\": \\\"Code E14 appeared after a power cycle.\\\"}, {\\\"source_ids\\\": [\\\"FL-005-MB\\\"], \\\"text\\\": \\\"For controller revision B, code E14 indicates a clock synchronization warning.\\\"}, {\\\"source_ids\\\": [\\\"FL-005-MA\\\"], \\\"text\\\": \\\"The manual entry for code E14 in revision A (cooling fan failure) does not apply to this unit, which is revision B.\\\"}], \\\"parts_used\\\": {\\\"items\\\": [], \\\"source_ids\\\": [\\\"FL-005-N1\\\"], \\\"state\\\": \\\"none\\\"}, \\\"priority\\\": {\\\"source_ids\\\": [\\\"FL-005-MB\\\"], \\\"state\\\": \\\"unknown\\\", \\\"value\\\": null}, \\\"proposed_actions\\\": [{\\\"basis\\\": \\\"source\\\", \\\"source_ids\\\": [\\\"FL-005-MB\\\"], \\\"text\\\": \\\"Record the code and request a diagnostic review.\\\"}], \\\"uncertainties\\\": [{\\\"field\\\": \\\"priority\\\", \\\"source_ids\\\": [\\\"FL-005-MB\\\"], \\\"text\\\": \\\"The manual excerpt for revision B does not assign a severity level to code E14.\\\"}, {\\\"field\\\": \\\"next_service_date\\\", \\\"source_ids\\\": [\\\"FL-005-MB\\\"], \\\"text\\\": \\\"The manual excerpt for revision B does not set a next service date for code E14.\\\"}]}\"},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"queue_time\":0.044912365,\"prompt_tokens\":1461,\"prompt_time\":0.121970808,\"completion_tokens\":402,\"completion_time\":0.86584758,\"total_tokens\":1863,\"total_time\":0.987818388},\"usage_breakdown\":null,\"system_fingerprint\":\"fp_c7e30c203c\",\"x_groq\":{\"id\":\"req_01m20wqb97ec9ty5fvaph61eng\",\"seed\":1715618059},\"service_tier\":\"on_demand\"}\n",
+  "response_sha256": "b1f88f4b3985d43f8a3c677681f9aee12aaab654d4f4d4e99716d7634908283b",
+  "rate_headers": {
+    "x-ratelimit-limit-requests": "1000",
+    "x-ratelimit-limit-tokens": "8000",
+    "x-ratelimit-remaining-requests": "990",
+    "x-ratelimit-remaining-tokens": "6112",
+    "x-ratelimit-reset-requests": "14m24s",
+    "x-ratelimit-reset-tokens": "14.16s"
+  },
+  "structural_status": "accepted",
+  "usage": {
+    "queue_time": 0.044912365,
+    "prompt_tokens": 1461,
+    "prompt_time": 0.121970808,
+    "completion_tokens": 402,
+    "completion_time": 0.86584758,
+    "total_tokens": 1863,
+    "total_time": 0.987818388
+  },
+  "returned_model": "qwen/qwen3.8-27b",
+  "finish_reason": "stop",
+  "raw_output": "{\"completed_work\": [], \"equipment_id\": {\"source_ids\": [\"FL-005-N1\"], \"state\": \"known\", \"value\": \"AX-06\"}, \"next_service_date\": {\"source_ids\": [\"FL-005-MB\"], \"state\": \"unknown\", \"value\": null}, \"observations\": [{\"source_ids\": [\"FL-005-N1\"], \"text\": \"The unit is identified as AX-06 with controller revision B, as printed on the label.\"}, {\"source_ids\": [\"FL-005-N1\"], \"text\": \"Code E14 appeared after a power cycle.\"}, {\"source_ids\": [\"FL-005-MB\"], \"text\": \"For controller revision B, code E14 indicates a clock synchronization warning.\"}, {\"source_ids\": [\"FL-005-MA\"], \"text\": \"The manual entry for code E14 in revision A (cooling fan failure) does not apply to this unit, which is revision B.\"}], \"parts_used\": {\"items\": [], \"source_ids\": [\"FL-005-N1\"], \"state\": \"none\"}, \"priority\": {\"source_ids\": [\"FL-005-MB\"], \"state\": \"unknown\", \"value\": null}, \"proposed_actions\": [{\"basis\": \"source\", \"source_ids\": [\"FL-005-MB\"], \"text\": \"Record the code and request a diagnostic review.\"}], \"uncertainties\": [{\"field\": \"priority\", \"source_ids\": [\"FL-005-MB\"], \"text\": \"The manual excerpt for revision B does not assign a severity level to code E14.\"}, {\"field\": \"next_service_date\", \"source_ids\": [\"FL-005-MB\"], \"text\": \"The manual excerpt for revision B does not set a next service date for code E14.\"}]}",
+  "output_sha256": "09226d827fb31c854318261a85387fd45768a42187774e9eea440c609d2cd599",
+  "report": {
+    "equipment_id": {
+      "state": "known",
+      "value": "AX-06",
+      "source_ids": [
+        "FL-005-N1"
+      ]
+    },
+    "observations": [
+      {
+        "text": "The unit is identified as AX-06 with controller revision B, as printed on the label.",
+        "source_ids": [
+          "FL-005-N1"
+        ]
+      },
+      {
+        "text": "Code E14 appeared after a power cycle.",
+        "source_ids": [
+          "FL-005-N1"
+        ]
+      },
+      {
+        "text": "For controller revision B, code E14 indicates a clock synchronization warning.",
+        "source_ids": [
+          "FL-005-MB"
+        ]
+      },
+      {
+        "text": "The manual entry for code E14 in revision A (cooling fan failure) does not apply to this unit, which is revision B.",
+        "source_ids": [
+          "FL-005-MA"
+        ]
+      }
+    ],
+    "completed_work": [],
+    "parts_used": {
+      "state": "none",
+      "items": [],
+      "source_ids": [
+        "FL-005-N1"
+      ]
+    },
+    "proposed_actions": [
+      {
+        "text": "Record the code and request a diagnostic review.",
+        "source_ids": [
+          "FL-005-MB"
+        ],
+        "basis": "source"
+      }
+    ],
+    "uncertainties": [
+      {
+        "text": "The manual excerpt for revision B does not assign a severity level to code E14.",
+        "source_ids": [
+          "FL-005-MB"
+        ],
+        "field": "priority"
+      },
+      {
+        "text": "The manual excerpt for revision B does not set a next service date for code E14.",
+        "source_ids": [
+          "FL-005-MB"
+        ],
+        "field": "next_service_date"
+      }
+    ],
+    "priority": {
+      "state": "unknown",
+      "value": null,
+      "source_ids": [
+        "FL-005-MB"
+      ]
+    },
+    "next_service_date": {
+      "state": "unknown",
+      "value": null,
+      "source_ids": [
+        "FL-005-MB"
+      ]
+    }
+  }
+}

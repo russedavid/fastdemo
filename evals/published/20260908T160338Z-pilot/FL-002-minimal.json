@@ -1,0 +1,524 @@
+{
+  "trace_id": "FL-002-minimal",
+  "case_id": "FL-002",
+  "variant": "minimal",
+  "input_sources": [
+    {
+      "id": "FL-002-N1",
+      "text": "Unit B-07. Before the restart, the inlet gauge read 0.8 bar. After the restart, the same gauge read 0.6 bar. No visible leak at the inlet joint. The rattling noise continued after the restart. No parts were fitted. I have not inspected the outlet joint.",
+      "type": "field_note"
+    }
+  ],
+  "request": {
+    "model": "qwen/qwen3.8-27b",
+    "temperature": 0.3,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Write a faithful maintenance report from the supplied source packet. Summarize the important observations, work performed, parts used, proposed actions, and unresolved information. Cite the source IDs for the information you report. Use the supplied JSON schema and return only the JSON object.\n"
+      },
+      {
+        "role": "user",
+        "content": "SOURCE PACKET\n{\"id\": \"FL-002-N1\", \"type\": \"field_note\"}\nUnit B-07. Before the restart, the inlet gauge read 0.8 bar. After the restart, the same gauge read 0.6 bar. No visible leak at the inlet joint. The rattling noise continued after the restart. No parts were fitted. I have not inspected the outlet joint.\n\nRESPONSE JSON SCHEMA\n{\"$defs\":{\"Claim\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-002-N1\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"text\",\"source_ids\"],\"title\":\"Claim\",\"type\":\"object\"},\"EvidenceValue\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-002-N1\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"EvidenceValue\",\"type\":\"object\"},\"Part\":{\"additionalProperties\":false,\"properties\":{\"part_number\":{\"minLength\":1,\"title\":\"Part Number\",\"type\":\"string\"},\"quantity\":{\"anyOf\":[{\"exclusiveMinimum\":0,\"type\":\"integer\"},{\"type\":\"null\"}],\"title\":\"Quantity\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-002-N1\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"part_number\",\"quantity\",\"source_ids\"],\"title\":\"Part\",\"type\":\"object\"},\"PartsUsed\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"none\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"items\":{\"items\":{\"$ref\":\"#/$defs/Part\"},\"title\":\"Items\",\"type\":\"array\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-002-N1\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"items\",\"source_ids\"],\"title\":\"PartsUsed\",\"type\":\"object\"},\"Priority\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"enum\":[\"low\",\"medium\",\"high\",\"critical\"],\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-002-N1\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"Priority\",\"type\":\"object\"},\"ProposedAction\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-002-N1\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"},\"basis\":{\"enum\":[\"source\",\"clarification\"],\"title\":\"Basis\",\"type\":\"string\"}},\"required\":[\"text\",\"source_ids\",\"basis\"],\"title\":\"ProposedAction\",\"type\":\"object\"},\"ServiceDate\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-002-N1\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"ServiceDate\",\"type\":\"object\"},\"Uncertainty\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-002-N1\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"},\"field\":{\"enum\":[\"equipment_id\",\"parts_used\",\"priority\",\"next_service_date\",\"other\"],\"title\":\"Field\",\"type\":\"string\"}},\"required\":[\"text\",\"source_ids\",\"field\"],\"title\":\"Uncertainty\",\"type\":\"object\"}},\"additionalProperties\":false,\"properties\":{\"equipment_id\":{\"$ref\":\"#/$defs/EvidenceValue\",\"description\":\"Exact equipment identifier copied verbatim. Put revision, location, and explanatory text in observations, not in this value.\"},\"observations\":{\"items\":{\"$ref\":\"#/$defs/Claim\"},\"minItems\":1,\"title\":\"Observations\",\"type\":\"array\"},\"completed_work\":{\"items\":{\"$ref\":\"#/$defs/Claim\"},\"title\":\"Completed Work\",\"type\":\"array\"},\"parts_used\":{\"$ref\":\"#/$defs/PartsUsed\"},\"proposed_actions\":{\"items\":{\"$ref\":\"#/$defs/ProposedAction\"},\"title\":\"Proposed Actions\",\"type\":\"array\"},\"uncertainties\":{\"items\":{\"$ref\":\"#/$defs/Uncertainty\"},\"title\":\"Uncertainties\",\"type\":\"array\"},\"priority\":{\"$ref\":\"#/$defs/Priority\"},\"next_service_date\":{\"$ref\":\"#/$defs/ServiceDate\"}},\"required\":[\"equipment_id\",\"observations\",\"completed_work\",\"parts_used\",\"proposed_actions\",\"uncertainties\",\"priority\",\"next_service_date\"],\"title\":\"Report\",\"type\":\"object\"}"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "frontline_report",
+        "strict": true,
+        "schema": {
+          "$defs": {
+            "Claim": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-002-N1"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids"
+              ],
+              "title": "Claim",
+              "type": "object"
+            },
+            "EvidenceValue": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-002-N1"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "EvidenceValue",
+              "type": "object"
+            },
+            "Part": {
+              "additionalProperties": false,
+              "properties": {
+                "part_number": {
+                  "minLength": 1,
+                  "title": "Part Number",
+                  "type": "string"
+                },
+                "quantity": {
+                  "anyOf": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Quantity"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-002-N1"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "part_number",
+                "quantity",
+                "source_ids"
+              ],
+              "title": "Part",
+              "type": "object"
+            },
+            "PartsUsed": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "none",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "items": {
+                  "items": {
+                    "$ref": "#/$defs/Part"
+                  },
+                  "title": "Items",
+                  "type": "array"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-002-N1"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "items",
+                "source_ids"
+              ],
+              "title": "PartsUsed",
+              "type": "object"
+            },
+            "Priority": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-002-N1"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "Priority",
+              "type": "object"
+            },
+            "ProposedAction": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-002-N1"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                },
+                "basis": {
+                  "enum": [
+                    "source",
+                    "clarification"
+                  ],
+                  "title": "Basis",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids",
+                "basis"
+              ],
+              "title": "ProposedAction",
+              "type": "object"
+            },
+            "ServiceDate": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-002-N1"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "ServiceDate",
+              "type": "object"
+            },
+            "Uncertainty": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-002-N1"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                },
+                "field": {
+                  "enum": [
+                    "equipment_id",
+                    "parts_used",
+                    "priority",
+                    "next_service_date",
+                    "other"
+                  ],
+                  "title": "Field",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids",
+                "field"
+              ],
+              "title": "Uncertainty",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "equipment_id": {
+              "$ref": "#/$defs/EvidenceValue",
+              "description": "Exact equipment identifier copied verbatim. Put revision, location, and explanatory text in observations, not in this value."
+            },
+            "observations": {
+              "items": {
+                "$ref": "#/$defs/Claim"
+              },
+              "minItems": 1,
+              "title": "Observations",
+              "type": "array"
+            },
+            "completed_work": {
+              "items": {
+                "$ref": "#/$defs/Claim"
+              },
+              "title": "Completed Work",
+              "type": "array"
+            },
+            "parts_used": {
+              "$ref": "#/$defs/PartsUsed"
+            },
+            "proposed_actions": {
+              "items": {
+                "$ref": "#/$defs/ProposedAction"
+              },
+              "title": "Proposed Actions",
+              "type": "array"
+            },
+            "uncertainties": {
+              "items": {
+                "$ref": "#/$defs/Uncertainty"
+              },
+              "title": "Uncertainties",
+              "type": "array"
+            },
+            "priority": {
+              "$ref": "#/$defs/Priority"
+            },
+            "next_service_date": {
+              "$ref": "#/$defs/ServiceDate"
+            }
+          },
+          "required": [
+            "equipment_id",
+            "observations",
+            "completed_work",
+            "parts_used",
+            "proposed_actions",
+            "uncertainties",
+            "priority",
+            "next_service_date"
+          ],
+          "title": "Report",
+          "type": "object"
+        }
+      }
+    },
+    "max_completion_tokens": 768,
+    "reasoning_effort": "none"
+  },
+  "request_sha256": "592cdc0d9e985637b8ecd2be7326bca5f0fa7880ffa1462f67ffb0f9c4a15249",
+  "source_sha256": "e2257171eef6c78050bae337e8f7dbcbdbcfc329349430f4e7d32fa6edec5655",
+  "started_at": "2026-09-08T16:05:48.890218+00:00",
+  "elapsed_seconds": 1.0412,
+  "http_status": 200,
+  "response_body": "{\"id\":\"chatcmpl-90e1f6db-c746-42c2-8e84-e7d97beb017c\",\"object\":\"chat.completion\",\"created\":1788883549,\"model\":\"qwen/qwen3.8-27b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"completed_work\\\": [{\\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"text\\\": \\\"Restarted Unit B-07.\\\"}], \\\"equipment_id\\\": {\\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"state\\\": \\\"known\\\", \\\"value\\\": \\\"B-07\\\"}, \\\"next_service_date\\\": {\\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"state\\\": \\\"unknown\\\", \\\"value\\\": null}, \\\"observations\\\": [{\\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"text\\\": \\\"Inlet gauge read 0.8 bar before restart.\\\"}, {\\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"text\\\": \\\"Inlet gauge read 0.6 bar after restart.\\\"}, {\\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"text\\\": \\\"No visible leak at the inlet joint.\\\"}, {\\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"text\\\": \\\"Rattling noise continued after the restart.\\\"}], \\\"parts_used\\\": {\\\"items\\\": [], \\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"state\\\": \\\"none\\\"}, \\\"priority\\\": {\\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"state\\\": \\\"unknown\\\", \\\"value\\\": null}, \\\"proposed_actions\\\": [{\\\"basis\\\": \\\"source\\\", \\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"text\\\": \\\"Inspect the outlet joint.\\\"}], \\\"uncertainties\\\": [{\\\"field\\\": \\\"other\\\", \\\"source_ids\\\": [\\\"FL-002-N1\\\"], \\\"text\\\": \\\"The outlet joint has not been inspected.\\\"}]}\"},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"queue_time\":0.015515273,\"prompt_tokens\":1192,\"prompt_time\":0.100685499,\"completion_tokens\":335,\"completion_time\":0.675012818,\"total_tokens\":1527,\"total_time\":0.775698317},\"usage_breakdown\":null,\"system_fingerprint\":\"fp_c7e30c203c\",\"x_groq\":{\"id\":\"req_01m20w9exzeb1b8c44hh85k2dr\",\"seed\":814109327},\"service_tier\":\"on_demand\"}\n",
+  "response_sha256": "40425d7f9ab9806e58b0cc5f99242224ae1e067be8212231ef5f0af81c8802ac",
+  "rate_headers": {
+    "x-ratelimit-limit-requests": "1000",
+    "x-ratelimit-limit-tokens": "8000",
+    "x-ratelimit-remaining-requests": "997",
+    "x-ratelimit-remaining-tokens": "6040",
+    "x-ratelimit-reset-requests": "4m19.2s",
+    "x-ratelimit-reset-tokens": "14.7s"
+  },
+  "structural_status": "accepted",
+  "usage": {
+    "queue_time": 0.015515273,
+    "prompt_tokens": 1192,
+    "prompt_time": 0.100685499,
+    "completion_tokens": 335,
+    "completion_time": 0.675012818,
+    "total_tokens": 1527,
+    "total_time": 0.775698317
+  },
+  "returned_model": "qwen/qwen3.8-27b",
+  "finish_reason": "stop",
+  "raw_output": "{\"completed_work\": [{\"source_ids\": [\"FL-002-N1\"], \"text\": \"Restarted Unit B-07.\"}], \"equipment_id\": {\"source_ids\": [\"FL-002-N1\"], \"state\": \"known\", \"value\": \"B-07\"}, \"next_service_date\": {\"source_ids\": [\"FL-002-N1\"], \"state\": \"unknown\", \"value\": null}, \"observations\": [{\"source_ids\": [\"FL-002-N1\"], \"text\": \"Inlet gauge read 0.8 bar before restart.\"}, {\"source_ids\": [\"FL-002-N1\"], \"text\": \"Inlet gauge read 0.6 bar after restart.\"}, {\"source_ids\": [\"FL-002-N1\"], \"text\": \"No visible leak at the inlet joint.\"}, {\"source_ids\": [\"FL-002-N1\"], \"text\": \"Rattling noise continued after the restart.\"}], \"parts_used\": {\"items\": [], \"source_ids\": [\"FL-002-N1\"], \"state\": \"none\"}, \"priority\": {\"source_ids\": [\"FL-002-N1\"], \"state\": \"unknown\", \"value\": null}, \"proposed_actions\": [{\"basis\": \"source\", \"source_ids\": [\"FL-002-N1\"], \"text\": \"Inspect the outlet joint.\"}], \"uncertainties\": [{\"field\": \"other\", \"source_ids\": [\"FL-002-N1\"], \"text\": \"The outlet joint has not been inspected.\"}]}",
+  "output_sha256": "1332054f5bbf9e650f4ed5de97ef8f619c4bf93d74a4e4c579b79ab43147adae",
+  "report": {
+    "equipment_id": {
+      "state": "known",
+      "value": "B-07",
+      "source_ids": [
+        "FL-002-N1"
+      ]
+    },
+    "observations": [
+      {
+        "text": "Inlet gauge read 0.8 bar before restart.",
+        "source_ids": [
+          "FL-002-N1"
+        ]
+      },
+      {
+        "text": "Inlet gauge read 0.6 bar after restart.",
+        "source_ids": [
+          "FL-002-N1"
+        ]
+      },
+      {
+        "text": "No visible leak at the inlet joint.",
+        "source_ids": [
+          "FL-002-N1"
+        ]
+      },
+      {
+        "text": "Rattling noise continued after the restart.",
+        "source_ids": [
+          "FL-002-N1"
+        ]
+      }
+    ],
+    "completed_work": [
+      {
+        "text": "Restarted Unit B-07.",
+        "source_ids": [
+          "FL-002-N1"
+        ]
+      }
+    ],
+    "parts_used": {
+      "state": "none",
+      "items": [],
+      "source_ids": [
+        "FL-002-N1"
+      ]
+    },
+    "proposed_actions": [
+      {
+        "text": "Inspect the outlet joint.",
+        "source_ids": [
+          "FL-002-N1"
+        ],
+        "basis": "source"
+      }
+    ],
+    "uncertainties": [
+      {
+        "text": "The outlet joint has not been inspected.",
+        "source_ids": [
+          "FL-002-N1"
+        ],
+        "field": "other"
+      }
+    ],
+    "priority": {
+      "state": "unknown",
+      "value": null,
+      "source_ids": [
+        "FL-002-N1"
+      ]
+    },
+    "next_service_date": {
+      "state": "unknown",
+      "value": null,
+      "source_ids": [
+        "FL-002-N1"
+      ]
+    }
+  }
+}

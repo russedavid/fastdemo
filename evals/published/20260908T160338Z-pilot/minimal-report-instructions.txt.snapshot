@@ -1,0 +1,1 @@
+Write a faithful maintenance report from the supplied source packet. Summarize the important observations, work performed, parts used, proposed actions, and unresolved information. Cite the source IDs for the information you report. Use the supplied JSON schema and return only the JSON object.

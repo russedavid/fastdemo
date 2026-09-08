@@ -1,0 +1,111 @@
+{
+  "dataset_sha256": "3efcbbeeac11726285a9573f0c8caaa6221a3fad6cd03ef90a0b5a3e09925ae9",
+  "cases": 20,
+  "sources": 30,
+  "splits": {
+    "development": 20
+  },
+  "exposure": {
+    "previously_used_in_development": 5,
+    "new_before_first_pilot_run": 15
+  },
+  "reference_review": {
+    "provisional_ai_authored": 20
+  },
+  "expected_field_states": {
+    "equipment_id": {
+      "known": 18,
+      "unknown": 2
+    },
+    "parts_used": {
+      "known": 5,
+      "none": 8,
+      "unknown": 6,
+      "conflicting": 1
+    },
+    "priority": {
+      "unknown": 18,
+      "known": 1,
+      "conflicting": 1
+    },
+    "next_service_date": {
+      "unknown": 19,
+      "known": 1
+    }
+  },
+  "sampling_families": {
+    "work_status": [
+      "FL-001"
+    ],
+    "measurement_scope": [
+      "FL-002"
+    ],
+    "missing_identity": [
+      "FL-003"
+    ],
+    "unresolved_conflict": [
+      "FL-004"
+    ],
+    "revision_applicability": [
+      "FL-005"
+    ],
+    "explicit_values": [
+      "FL-006"
+    ],
+    "ambiguous_date": [
+      "FL-007"
+    ],
+    "multiple_entities": [
+      "FL-008"
+    ],
+    "unknown_quantity": [
+      "FL-009"
+    ],
+    "inventory_vs_installation": [
+      "FL-010"
+    ],
+    "explicit_correction": [
+      "FL-011"
+    ],
+    "priority_conflict": [
+      "FL-012"
+    ],
+    "temporary_recovery": [
+      "FL-013"
+    ],
+    "limited_test_scope": [
+      "FL-014"
+    ],
+    "duplicate_evidence": [
+      "FL-015"
+    ],
+    "historical_scope": [
+      "FL-016"
+    ],
+    "embedded_instruction": [
+      "FL-017"
+    ],
+    "thermal_thresholds": [
+      "FL-018"
+    ],
+    "fan_control_defaults": [
+      "FL-019"
+    ],
+    "uncertain_extraction": [
+      "FL-020"
+    ]
+  },
+  "shared_reference_groups": [
+    [
+      "FL-018",
+      "FL-019"
+    ]
+  ],
+  "exact_duplicate_source_groups": [],
+  "coverage_warnings": [
+    "Only one case establishes a known priority and one establishes a next-service date; do not infer broad performance from mostly unknown-value cases.",
+    "Conflicting equipment IDs and conflicting service dates are not covered in this pilot.",
+    "Simulated OCR text is not a live vision evaluation; all field observations are synthetic.",
+    "No human-reviewed labels or final holdout are present."
+  ]
+}

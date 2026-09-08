@@ -1,0 +1,533 @@
+{
+  "trace_id": "FL-004-minimal",
+  "case_id": "FL-004",
+  "variant": "minimal",
+  "input_sources": [
+    {
+      "id": "FL-004-N1",
+      "recorded_at": "2026-08-14T10:17:00Z",
+      "text": "Reporter A, WO-205, unit P-09, 10:00 visit on August 14. I replaced the motor with one MTR-41.",
+      "type": "field_note"
+    },
+    {
+      "id": "FL-004-N2",
+      "recorded_at": "2026-08-14T10:24:00Z",
+      "text": "Reporter B, WO-205, unit P-09, the same 10:00 visit on August 14. The MTR-41 motor was not installed. It was left boxed beside the unit.",
+      "type": "field_note"
+    }
+  ],
+  "request": {
+    "model": "qwen/qwen3.8-27b",
+    "temperature": 0.3,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Write a faithful maintenance report from the supplied source packet. Summarize the important observations, work performed, parts used, proposed actions, and unresolved information. Cite the source IDs for the information you report. Use the supplied JSON schema and return only the JSON object.\n"
+      },
+      {
+        "role": "user",
+        "content": "SOURCE PACKET\n{\"id\": \"FL-004-N1\", \"type\": \"field_note\", \"recorded_at\": \"2026-08-14T10:17:00Z\"}\nReporter A, WO-205, unit P-09, 10:00 visit on August 14. I replaced the motor with one MTR-41.\n\n{\"id\": \"FL-004-N2\", \"type\": \"field_note\", \"recorded_at\": \"2026-08-14T10:24:00Z\"}\nReporter B, WO-205, unit P-09, the same 10:00 visit on August 14. The MTR-41 motor was not installed. It was left boxed beside the unit.\n\nRESPONSE JSON SCHEMA\n{\"$defs\":{\"Claim\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-004-N1\",\"FL-004-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"text\",\"source_ids\"],\"title\":\"Claim\",\"type\":\"object\"},\"EvidenceValue\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-004-N1\",\"FL-004-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"EvidenceValue\",\"type\":\"object\"},\"Part\":{\"additionalProperties\":false,\"properties\":{\"part_number\":{\"minLength\":1,\"title\":\"Part Number\",\"type\":\"string\"},\"quantity\":{\"anyOf\":[{\"exclusiveMinimum\":0,\"type\":\"integer\"},{\"type\":\"null\"}],\"title\":\"Quantity\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-004-N1\",\"FL-004-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"part_number\",\"quantity\",\"source_ids\"],\"title\":\"Part\",\"type\":\"object\"},\"PartsUsed\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"none\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"items\":{\"items\":{\"$ref\":\"#/$defs/Part\"},\"title\":\"Items\",\"type\":\"array\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-004-N1\",\"FL-004-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"items\",\"source_ids\"],\"title\":\"PartsUsed\",\"type\":\"object\"},\"Priority\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"enum\":[\"low\",\"medium\",\"high\",\"critical\"],\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-004-N1\",\"FL-004-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"Priority\",\"type\":\"object\"},\"ProposedAction\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-004-N1\",\"FL-004-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"},\"basis\":{\"enum\":[\"source\",\"clarification\"],\"title\":\"Basis\",\"type\":\"string\"}},\"required\":[\"text\",\"source_ids\",\"basis\"],\"title\":\"ProposedAction\",\"type\":\"object\"},\"ServiceDate\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-004-N1\",\"FL-004-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"ServiceDate\",\"type\":\"object\"},\"Uncertainty\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-004-N1\",\"FL-004-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"},\"field\":{\"enum\":[\"equipment_id\",\"parts_used\",\"priority\",\"next_service_date\",\"other\"],\"title\":\"Field\",\"type\":\"string\"}},\"required\":[\"text\",\"source_ids\",\"field\"],\"title\":\"Uncertainty\",\"type\":\"object\"}},\"additionalProperties\":false,\"properties\":{\"equipment_id\":{\"$ref\":\"#/$defs/EvidenceValue\",\"description\":\"Exact equipment identifier copied verbatim. Put revision, location, and explanatory text in observations, not in this value.\"},\"observations\":{\"items\":{\"$ref\":\"#/$defs/Claim\"},\"minItems\":1,\"title\":\"Observations\",\"type\":\"array\"},\"completed_work\":{\"items\":{\"$ref\":\"#/$defs/Claim\"},\"title\":\"Completed Work\",\"type\":\"array\"},\"parts_used\":{\"$ref\":\"#/$defs/PartsUsed\"},\"proposed_actions\":{\"items\":{\"$ref\":\"#/$defs/ProposedAction\"},\"title\":\"Proposed Actions\",\"type\":\"array\"},\"uncertainties\":{\"items\":{\"$ref\":\"#/$defs/Uncertainty\"},\"title\":\"Uncertainties\",\"type\":\"array\"},\"priority\":{\"$ref\":\"#/$defs/Priority\"},\"next_service_date\":{\"$ref\":\"#/$defs/ServiceDate\"}},\"required\":[\"equipment_id\",\"observations\",\"completed_work\",\"parts_used\",\"proposed_actions\",\"uncertainties\",\"priority\",\"next_service_date\"],\"title\":\"Report\",\"type\":\"object\"}"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "frontline_report",
+        "strict": true,
+        "schema": {
+          "$defs": {
+            "Claim": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-004-N1",
+                      "FL-004-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids"
+              ],
+              "title": "Claim",
+              "type": "object"
+            },
+            "EvidenceValue": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-004-N1",
+                      "FL-004-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "EvidenceValue",
+              "type": "object"
+            },
+            "Part": {
+              "additionalProperties": false,
+              "properties": {
+                "part_number": {
+                  "minLength": 1,
+                  "title": "Part Number",
+                  "type": "string"
+                },
+                "quantity": {
+                  "anyOf": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Quantity"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-004-N1",
+                      "FL-004-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "part_number",
+                "quantity",
+                "source_ids"
+              ],
+              "title": "Part",
+              "type": "object"
+            },
+            "PartsUsed": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "none",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "items": {
+                  "items": {
+                    "$ref": "#/$defs/Part"
+                  },
+                  "title": "Items",
+                  "type": "array"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-004-N1",
+                      "FL-004-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "items",
+                "source_ids"
+              ],
+              "title": "PartsUsed",
+              "type": "object"
+            },
+            "Priority": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-004-N1",
+                      "FL-004-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "Priority",
+              "type": "object"
+            },
+            "ProposedAction": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-004-N1",
+                      "FL-004-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                },
+                "basis": {
+                  "enum": [
+                    "source",
+                    "clarification"
+                  ],
+                  "title": "Basis",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids",
+                "basis"
+              ],
+              "title": "ProposedAction",
+              "type": "object"
+            },
+            "ServiceDate": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-004-N1",
+                      "FL-004-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "ServiceDate",
+              "type": "object"
+            },
+            "Uncertainty": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-004-N1",
+                      "FL-004-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                },
+                "field": {
+                  "enum": [
+                    "equipment_id",
+                    "parts_used",
+                    "priority",
+                    "next_service_date",
+                    "other"
+                  ],
+                  "title": "Field",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids",
+                "field"
+              ],
+              "title": "Uncertainty",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "equipment_id": {
+              "$ref": "#/$defs/EvidenceValue",
+              "description": "Exact equipment identifier copied verbatim. Put revision, location, and explanatory text in observations, not in this value."
+            },
+            "observations": {
+              "items": {
+                "$ref": "#/$defs/Claim"
+              },
+              "minItems": 1,
+              "title": "Observations",
+              "type": "array"
+            },
+            "completed_work": {
+              "items": {
+                "$ref": "#/$defs/Claim"
+              },
+              "title": "Completed Work",
+              "type": "array"
+            },
+            "parts_used": {
+              "$ref": "#/$defs/PartsUsed"
+            },
+            "proposed_actions": {
+              "items": {
+                "$ref": "#/$defs/ProposedAction"
+              },
+              "title": "Proposed Actions",
+              "type": "array"
+            },
+            "uncertainties": {
+              "items": {
+                "$ref": "#/$defs/Uncertainty"
+              },
+              "title": "Uncertainties",
+              "type": "array"
+            },
+            "priority": {
+              "$ref": "#/$defs/Priority"
+            },
+            "next_service_date": {
+              "$ref": "#/$defs/ServiceDate"
+            }
+          },
+          "required": [
+            "equipment_id",
+            "observations",
+            "completed_work",
+            "parts_used",
+            "proposed_actions",
+            "uncertainties",
+            "priority",
+            "next_service_date"
+          ],
+          "title": "Report",
+          "type": "object"
+        }
+      }
+    },
+    "max_completion_tokens": 768,
+    "reasoning_effort": "none"
+  },
+  "request_sha256": "1336a3768189d6a607a7c911e8ede6767f343ad1a1c00aab3c48e568efe3270e",
+  "source_sha256": "8a7edf79758865045a9cd925dc50f1e8664a5bd93cd7771191a9da27226e5737",
+  "started_at": "2026-09-08T16:10:08.898516+00:00",
+  "elapsed_seconds": 1.4263,
+  "http_status": 200,
+  "response_body": "{\"id\":\"chatcmpl-90a6d997-7ffb-4100-a4c6-4c98f622c964\",\"object\":\"chat.completion\",\"created\":1788883810,\"model\":\"qwen/qwen3.8-27b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"completed_work\\\": [], \\\"equipment_id\\\": {\\\"source_ids\\\": [\\\"FL-004-N1\\\", \\\"FL-004-N2\\\"], \\\"state\\\": \\\"known\\\", \\\"value\\\": \\\"P-09\\\"}, \\\"next_service_date\\\": {\\\"source_ids\\\": [\\\"FL-004-N1\\\", \\\"FL-004-N2\\\"], \\\"state\\\": \\\"unknown\\\", \\\"value\\\": null}, \\\"observations\\\": [{\\\"source_ids\\\": [\\\"FL-004-N1\\\"], \\\"text\\\": \\\"Reporter A recorded a visit to unit P-09 at 10:00 on August 14.\\\"}, {\\\"source_ids\\\": [\\\"FL-004-N2\\\"], \\\"text\\\": \\\"Reporter B recorded the same visit to unit P-09 at 10:00 on August 14.\\\"}, {\\\"source_ids\\\": [\\\"FL-004-N1\\\", \\\"FL-004-N2\\\"], \\\"text\\\": \\\"There is a direct conflict regarding the status of the MTR-41 motor: Reporter A claims it was replaced/installed, while Reporter B states it was left boxed beside the unit and not installed.\\\"}], \\\"parts_used\\\": {\\\"items\\\": [], \\\"source_ids\\\": [\\\"FL-004-N1\\\", \\\"FL-004-N2\\\"], \\\"state\\\": \\\"conflicting\\\"}, \\\"priority\\\": {\\\"source_ids\\\": [\\\"FL-004-N1\\\", \\\"FL-004-N2\\\"], \\\"state\\\": \\\"unknown\\\", \\\"value\\\": null}, \\\"proposed_actions\\\": [{\\\"basis\\\": \\\"clarification\\\", \\\"source_ids\\\": [\\\"FL-004-N1\\\", \\\"FL-004-N2\\\"], \\\"text\\\": \\\"Verify the physical status of the MTR-41 motor on unit P-09 to resolve the discrepancy between the two field notes.\\\"}], \\\"uncertainties\\\": [{\\\"field\\\": \\\"parts_used\\\", \\\"source_ids\\\": [\\\"FL-004-N1\\\", \\\"FL-004-N2\\\"], \\\"text\\\": \\\"It is unclear if the MTR-41 motor was actually installed or if it remains in the box, as the two reports contradict each other.\\\"}]}\"},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"queue_time\":0.055185573,\"prompt_tokens\":1356,\"prompt_time\":0.117317231,\"completion_tokens\":452,\"completion_time\":0.944118402,\"total_tokens\":1808,\"total_time\":1.061435633},\"usage_breakdown\":null,\"system_fingerprint\":\"fp_c7e30c203c\",\"x_groq\":{\"id\":\"req_01m20whcy3edx97c8scytq5g32\",\"seed\":1197124845},\"service_tier\":\"on_demand\"}\n",
+  "response_sha256": "7399a78ab9c5d7dbd26f58ebfabda9d1cc158b435c2af3989f5f91b0ccf8912b",
+  "rate_headers": {
+    "x-ratelimit-limit-requests": "1000",
+    "x-ratelimit-limit-tokens": "8000",
+    "x-ratelimit-remaining-requests": "993",
+    "x-ratelimit-remaining-tokens": "5876",
+    "x-ratelimit-reset-requests": "10m4.8s",
+    "x-ratelimit-reset-tokens": "15.93s"
+  },
+  "structural_status": "accepted",
+  "usage": {
+    "queue_time": 0.055185573,
+    "prompt_tokens": 1356,
+    "prompt_time": 0.117317231,
+    "completion_tokens": 452,
+    "completion_time": 0.944118402,
+    "total_tokens": 1808,
+    "total_time": 1.061435633
+  },
+  "returned_model": "qwen/qwen3.8-27b",
+  "finish_reason": "stop",
+  "raw_output": "{\"completed_work\": [], \"equipment_id\": {\"source_ids\": [\"FL-004-N1\", \"FL-004-N2\"], \"state\": \"known\", \"value\": \"P-09\"}, \"next_service_date\": {\"source_ids\": [\"FL-004-N1\", \"FL-004-N2\"], \"state\": \"unknown\", \"value\": null}, \"observations\": [{\"source_ids\": [\"FL-004-N1\"], \"text\": \"Reporter A recorded a visit to unit P-09 at 10:00 on August 14.\"}, {\"source_ids\": [\"FL-004-N2\"], \"text\": \"Reporter B recorded the same visit to unit P-09 at 10:00 on August 14.\"}, {\"source_ids\": [\"FL-004-N1\", \"FL-004-N2\"], \"text\": \"There is a direct conflict regarding the status of the MTR-41 motor: Reporter A claims it was replaced/installed, while Reporter B states it was left boxed beside the unit and not installed.\"}], \"parts_used\": {\"items\": [], \"source_ids\": [\"FL-004-N1\", \"FL-004-N2\"], \"state\": \"conflicting\"}, \"priority\": {\"source_ids\": [\"FL-004-N1\", \"FL-004-N2\"], \"state\": \"unknown\", \"value\": null}, \"proposed_actions\": [{\"basis\": \"clarification\", \"source_ids\": [\"FL-004-N1\", \"FL-004-N2\"], \"text\": \"Verify the physical status of the MTR-41 motor on unit P-09 to resolve the discrepancy between the two field notes.\"}], \"uncertainties\": [{\"field\": \"parts_used\", \"source_ids\": [\"FL-004-N1\", \"FL-004-N2\"], \"text\": \"It is unclear if the MTR-41 motor was actually installed or if it remains in the box, as the two reports contradict each other.\"}]}",
+  "output_sha256": "d26311ff576399963f312f589f1cd1c4dbe4191ca196f05895605eb8d1aa03e2",
+  "report": {
+    "equipment_id": {
+      "state": "known",
+      "value": "P-09",
+      "source_ids": [
+        "FL-004-N1",
+        "FL-004-N2"
+      ]
+    },
+    "observations": [
+      {
+        "text": "Reporter A recorded a visit to unit P-09 at 10:00 on August 14.",
+        "source_ids": [
+          "FL-004-N1"
+        ]
+      },
+      {
+        "text": "Reporter B recorded the same visit to unit P-09 at 10:00 on August 14.",
+        "source_ids": [
+          "FL-004-N2"
+        ]
+      },
+      {
+        "text": "There is a direct conflict regarding the status of the MTR-41 motor: Reporter A claims it was replaced/installed, while Reporter B states it was left boxed beside the unit and not installed.",
+        "source_ids": [
+          "FL-004-N1",
+          "FL-004-N2"
+        ]
+      }
+    ],
+    "completed_work": [],
+    "parts_used": {
+      "state": "conflicting",
+      "items": [],
+      "source_ids": [
+        "FL-004-N1",
+        "FL-004-N2"
+      ]
+    },
+    "proposed_actions": [
+      {
+        "text": "Verify the physical status of the MTR-41 motor on unit P-09 to resolve the discrepancy between the two field notes.",
+        "source_ids": [
+          "FL-004-N1",
+          "FL-004-N2"
+        ],
+        "basis": "clarification"
+      }
+    ],
+    "uncertainties": [
+      {
+        "text": "It is unclear if the MTR-41 motor was actually installed or if it remains in the box, as the two reports contradict each other.",
+        "source_ids": [
+          "FL-004-N1",
+          "FL-004-N2"
+        ],
+        "field": "parts_used"
+      }
+    ],
+    "priority": {
+      "state": "unknown",
+      "value": null,
+      "source_ids": [
+        "FL-004-N1",
+        "FL-004-N2"
+      ]
+    },
+    "next_service_date": {
+      "state": "unknown",
+      "value": null,
+      "source_ids": [
+        "FL-004-N1",
+        "FL-004-N2"
+      ]
+    }
+  }
+}

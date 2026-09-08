@@ -1,0 +1,554 @@
+{
+  "trace_id": "FL-018-minimal",
+  "case_id": "FL-018",
+  "variant": "minimal",
+  "input_sources": [
+    {
+      "id": "FL-018-N1",
+      "text": "Gateway GW-18 uses a Raspberry Pi 4 Model B with default thermal settings. During this observation the SoC temperature rose to 82 degrees Celsius and the Arm clock decreased. The GPU clock was not measured. No maintenance or parts use was recorded.",
+      "type": "field_note"
+    },
+    {
+      "attribution": "Raspberry Pi Ltd; summary by the project assistant; source commit 9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f",
+      "id": "FL-018-N2",
+      "license": "CC-BY-SA-4.0",
+      "origin": "paraphrase_of_public_documentation",
+      "reference_uri": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc",
+      "text": "Raspberry Pi thermal guidance: in the 80–85 °C range, Arm cores are progressively throttled. At 85 °C, both Arm cores and the GPU are throttled. This describes thermal-management behavior, not evidence that a repair was performed.",
+      "type": "public_reference_summary"
+    }
+  ],
+  "request": {
+    "model": "qwen/qwen3.8-27b",
+    "temperature": 0.3,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Write a faithful maintenance report from the supplied source packet. Summarize the important observations, work performed, parts used, proposed actions, and unresolved information. Cite the source IDs for the information you report. Use the supplied JSON schema and return only the JSON object.\n"
+      },
+      {
+        "role": "user",
+        "content": "SOURCE PACKET\n{\"id\": \"FL-018-N1\", \"type\": \"field_note\"}\nGateway GW-18 uses a Raspberry Pi 4 Model B with default thermal settings. During this observation the SoC temperature rose to 82 degrees Celsius and the Arm clock decreased. The GPU clock was not measured. No maintenance or parts use was recorded.\n\n{\"id\": \"FL-018-N2\", \"type\": \"public_reference_summary\"}\nRaspberry Pi thermal guidance: in the 80–85 °C range, Arm cores are progressively throttled. At 85 °C, both Arm cores and the GPU are throttled. This describes thermal-management behavior, not evidence that a repair was performed.\n\nRESPONSE JSON SCHEMA\n{\"$defs\":{\"Claim\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-018-N1\",\"FL-018-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"text\",\"source_ids\"],\"title\":\"Claim\",\"type\":\"object\"},\"EvidenceValue\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-018-N1\",\"FL-018-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"EvidenceValue\",\"type\":\"object\"},\"Part\":{\"additionalProperties\":false,\"properties\":{\"part_number\":{\"minLength\":1,\"title\":\"Part Number\",\"type\":\"string\"},\"quantity\":{\"anyOf\":[{\"exclusiveMinimum\":0,\"type\":\"integer\"},{\"type\":\"null\"}],\"title\":\"Quantity\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-018-N1\",\"FL-018-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"part_number\",\"quantity\",\"source_ids\"],\"title\":\"Part\",\"type\":\"object\"},\"PartsUsed\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"none\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"items\":{\"items\":{\"$ref\":\"#/$defs/Part\"},\"title\":\"Items\",\"type\":\"array\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-018-N1\",\"FL-018-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"items\",\"source_ids\"],\"title\":\"PartsUsed\",\"type\":\"object\"},\"Priority\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"enum\":[\"low\",\"medium\",\"high\",\"critical\"],\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-018-N1\",\"FL-018-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"Priority\",\"type\":\"object\"},\"ProposedAction\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-018-N1\",\"FL-018-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"},\"basis\":{\"enum\":[\"source\",\"clarification\"],\"title\":\"Basis\",\"type\":\"string\"}},\"required\":[\"text\",\"source_ids\",\"basis\"],\"title\":\"ProposedAction\",\"type\":\"object\"},\"ServiceDate\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-018-N1\",\"FL-018-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"ServiceDate\",\"type\":\"object\"},\"Uncertainty\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-018-N1\",\"FL-018-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"},\"field\":{\"enum\":[\"equipment_id\",\"parts_used\",\"priority\",\"next_service_date\",\"other\"],\"title\":\"Field\",\"type\":\"string\"}},\"required\":[\"text\",\"source_ids\",\"field\"],\"title\":\"Uncertainty\",\"type\":\"object\"}},\"additionalProperties\":false,\"properties\":{\"equipment_id\":{\"$ref\":\"#/$defs/EvidenceValue\",\"description\":\"Exact equipment identifier copied verbatim. Put revision, location, and explanatory text in observations, not in this value.\"},\"observations\":{\"items\":{\"$ref\":\"#/$defs/Claim\"},\"minItems\":1,\"title\":\"Observations\",\"type\":\"array\"},\"completed_work\":{\"items\":{\"$ref\":\"#/$defs/Claim\"},\"title\":\"Completed Work\",\"type\":\"array\"},\"parts_used\":{\"$ref\":\"#/$defs/PartsUsed\"},\"proposed_actions\":{\"items\":{\"$ref\":\"#/$defs/ProposedAction\"},\"title\":\"Proposed Actions\",\"type\":\"array\"},\"uncertainties\":{\"items\":{\"$ref\":\"#/$defs/Uncertainty\"},\"title\":\"Uncertainties\",\"type\":\"array\"},\"priority\":{\"$ref\":\"#/$defs/Priority\"},\"next_service_date\":{\"$ref\":\"#/$defs/ServiceDate\"}},\"required\":[\"equipment_id\",\"observations\",\"completed_work\",\"parts_used\",\"proposed_actions\",\"uncertainties\",\"priority\",\"next_service_date\"],\"title\":\"Report\",\"type\":\"object\"}"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "frontline_report",
+        "strict": true,
+        "schema": {
+          "$defs": {
+            "Claim": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-018-N1",
+                      "FL-018-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids"
+              ],
+              "title": "Claim",
+              "type": "object"
+            },
+            "EvidenceValue": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-018-N1",
+                      "FL-018-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "EvidenceValue",
+              "type": "object"
+            },
+            "Part": {
+              "additionalProperties": false,
+              "properties": {
+                "part_number": {
+                  "minLength": 1,
+                  "title": "Part Number",
+                  "type": "string"
+                },
+                "quantity": {
+                  "anyOf": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Quantity"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-018-N1",
+                      "FL-018-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "part_number",
+                "quantity",
+                "source_ids"
+              ],
+              "title": "Part",
+              "type": "object"
+            },
+            "PartsUsed": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "none",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "items": {
+                  "items": {
+                    "$ref": "#/$defs/Part"
+                  },
+                  "title": "Items",
+                  "type": "array"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-018-N1",
+                      "FL-018-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "items",
+                "source_ids"
+              ],
+              "title": "PartsUsed",
+              "type": "object"
+            },
+            "Priority": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-018-N1",
+                      "FL-018-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "Priority",
+              "type": "object"
+            },
+            "ProposedAction": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-018-N1",
+                      "FL-018-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                },
+                "basis": {
+                  "enum": [
+                    "source",
+                    "clarification"
+                  ],
+                  "title": "Basis",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids",
+                "basis"
+              ],
+              "title": "ProposedAction",
+              "type": "object"
+            },
+            "ServiceDate": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-018-N1",
+                      "FL-018-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "ServiceDate",
+              "type": "object"
+            },
+            "Uncertainty": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-018-N1",
+                      "FL-018-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                },
+                "field": {
+                  "enum": [
+                    "equipment_id",
+                    "parts_used",
+                    "priority",
+                    "next_service_date",
+                    "other"
+                  ],
+                  "title": "Field",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids",
+                "field"
+              ],
+              "title": "Uncertainty",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "equipment_id": {
+              "$ref": "#/$defs/EvidenceValue",
+              "description": "Exact equipment identifier copied verbatim. Put revision, location, and explanatory text in observations, not in this value."
+            },
+            "observations": {
+              "items": {
+                "$ref": "#/$defs/Claim"
+              },
+              "minItems": 1,
+              "title": "Observations",
+              "type": "array"
+            },
+            "completed_work": {
+              "items": {
+                "$ref": "#/$defs/Claim"
+              },
+              "title": "Completed Work",
+              "type": "array"
+            },
+            "parts_used": {
+              "$ref": "#/$defs/PartsUsed"
+            },
+            "proposed_actions": {
+              "items": {
+                "$ref": "#/$defs/ProposedAction"
+              },
+              "title": "Proposed Actions",
+              "type": "array"
+            },
+            "uncertainties": {
+              "items": {
+                "$ref": "#/$defs/Uncertainty"
+              },
+              "title": "Uncertainties",
+              "type": "array"
+            },
+            "priority": {
+              "$ref": "#/$defs/Priority"
+            },
+            "next_service_date": {
+              "$ref": "#/$defs/ServiceDate"
+            }
+          },
+          "required": [
+            "equipment_id",
+            "observations",
+            "completed_work",
+            "parts_used",
+            "proposed_actions",
+            "uncertainties",
+            "priority",
+            "next_service_date"
+          ],
+          "title": "Report",
+          "type": "object"
+        }
+      }
+    },
+    "max_completion_tokens": 768,
+    "reasoning_effort": "none"
+  },
+  "request_sha256": "eae14a154d9ed7d1c5a5d9c11d647adb80c6eaa1bf4ad4cee452017f485f375d",
+  "source_sha256": "ec4f78b345e4792324101d715ea0c3b46fb3adce4c49475cd3f8bb6a05510871",
+  "started_at": "2026-09-08T16:40:28.976484+00:00",
+  "elapsed_seconds": 1.5086,
+  "http_status": 200,
+  "response_body": "{\"id\":\"chatcmpl-3a09f793-08a0-4a66-a32d-7b2072a79c93\",\"object\":\"chat.completion\",\"created\":1788885630,\"model\":\"qwen/qwen3.8-27b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"completed_work\\\": [], \\\"equipment_id\\\": {\\\"source_ids\\\": [\\\"FL-018-N1\\\"], \\\"state\\\": \\\"known\\\", \\\"value\\\": \\\"GW-18\\\"}, \\\"next_service_date\\\": {\\\"source_ids\\\": [\\\"FL-018-N1\\\"], \\\"state\\\": \\\"unknown\\\", \\\"value\\\": null}, \\\"observations\\\": [{\\\"source_ids\\\": [\\\"FL-018-N1\\\"], \\\"text\\\": \\\"Gateway GW-18 uses a Raspberry Pi 4 Model B with default thermal settings.\\\"}, {\\\"source_ids\\\": [\\\"FL-018-N1\\\"], \\\"text\\\": \\\"During observation, the SoC temperature rose to 82 degrees Celsius.\\\"}, {\\\"source_ids\\\": [\\\"FL-018-N1\\\"], \\\"text\\\": \\\"The Arm clock decreased during the high-temperature event.\\\"}, {\\\"source_ids\\\": [\\\"FL-018-N1\\\"], \\\"text\\\": \\\"The GPU clock was not measured.\\\"}, {\\\"source_ids\\\": [\\\"FL-018-N2\\\"], \\\"text\\\": \\\"Raspberry Pi thermal guidance indicates that in the 80–85 °C range, Arm cores are progressively throttled.\\\"}, {\\\"source_ids\\\": [\\\"FL-018-N2\\\"], \\\"text\\\": \\\"At 85 °C, both Arm cores and the GPU are throttled.\\\"}], \\\"parts_used\\\": {\\\"items\\\": [], \\\"source_ids\\\": [\\\"FL-018-N1\\\"], \\\"state\\\": \\\"none\\\"}, \\\"priority\\\": {\\\"source_ids\\\": [\\\"FL-018-N1\\\", \\\"FL-018-N2\\\"], \\\"state\\\": \\\"unknown\\\", \\\"value\\\": null}, \\\"proposed_actions\\\": [{\\\"basis\\\": \\\"source\\\", \\\"source_ids\\\": [\\\"FL-018-N2\\\"], \\\"text\\\": \\\"Monitor thermal performance to ensure temperatures do not reach 85 °C, which would trigger GPU throttling in addition to Arm throttling.\\\"}], \\\"uncertainties\\\": [{\\\"field\\\": \\\"other\\\", \\\"source_ids\\\": [\\\"FL-018-N1\\\"], \\\"text\\\": \\\"The GPU clock frequency was not measured, so the specific impact on GPU performance at 82 °C is unverified.\\\"}, {\\\"field\\\": \\\"other\\\", \\\"source_ids\\\": [\\\"FL-018-N1\\\"], \\\"text\\\": \\\"No maintenance or parts use was recorded, so it is unclear if any prior interventions affected the current thermal behavior.\\\"}]}\"},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"queue_time\":0.07311069,\"prompt_tokens\":1323,\"prompt_time\":0.10661051,\"completion_tokens\":494,\"completion_time\":0.981281551,\"total_tokens\":1817,\"total_time\":1.087892061},\"usage_breakdown\":null,\"system_fingerprint\":\"fp_1944680867\",\"x_groq\":{\"id\":\"req_01m20y8y99er9r2xxbgc9bmxte\",\"seed\":1914522159},\"service_tier\":\"on_demand\"}\n",
+  "response_sha256": "9507ac6b3cf8aa3cc378e1b318506b5ddbde497cd60cdb2608c649d8bc97f55a",
+  "rate_headers": {
+    "x-ratelimit-limit-requests": "1000",
+    "x-ratelimit-limit-tokens": "8000",
+    "x-ratelimit-remaining-requests": "965",
+    "x-ratelimit-remaining-tokens": "5909",
+    "x-ratelimit-reset-requests": "50m24s",
+    "x-ratelimit-reset-tokens": "15.682s"
+  },
+  "structural_status": "accepted",
+  "usage": {
+    "queue_time": 0.07311069,
+    "prompt_tokens": 1323,
+    "prompt_time": 0.10661051,
+    "completion_tokens": 494,
+    "completion_time": 0.981281551,
+    "total_tokens": 1817,
+    "total_time": 1.087892061
+  },
+  "returned_model": "qwen/qwen3.8-27b",
+  "finish_reason": "stop",
+  "raw_output": "{\"completed_work\": [], \"equipment_id\": {\"source_ids\": [\"FL-018-N1\"], \"state\": \"known\", \"value\": \"GW-18\"}, \"next_service_date\": {\"source_ids\": [\"FL-018-N1\"], \"state\": \"unknown\", \"value\": null}, \"observations\": [{\"source_ids\": [\"FL-018-N1\"], \"text\": \"Gateway GW-18 uses a Raspberry Pi 4 Model B with default thermal settings.\"}, {\"source_ids\": [\"FL-018-N1\"], \"text\": \"During observation, the SoC temperature rose to 82 degrees Celsius.\"}, {\"source_ids\": [\"FL-018-N1\"], \"text\": \"The Arm clock decreased during the high-temperature event.\"}, {\"source_ids\": [\"FL-018-N1\"], \"text\": \"The GPU clock was not measured.\"}, {\"source_ids\": [\"FL-018-N2\"], \"text\": \"Raspberry Pi thermal guidance indicates that in the 80–85 °C range, Arm cores are progressively throttled.\"}, {\"source_ids\": [\"FL-018-N2\"], \"text\": \"At 85 °C, both Arm cores and the GPU are throttled.\"}], \"parts_used\": {\"items\": [], \"source_ids\": [\"FL-018-N1\"], \"state\": \"none\"}, \"priority\": {\"source_ids\": [\"FL-018-N1\", \"FL-018-N2\"], \"state\": \"unknown\", \"value\": null}, \"proposed_actions\": [{\"basis\": \"source\", \"source_ids\": [\"FL-018-N2\"], \"text\": \"Monitor thermal performance to ensure temperatures do not reach 85 °C, which would trigger GPU throttling in addition to Arm throttling.\"}], \"uncertainties\": [{\"field\": \"other\", \"source_ids\": [\"FL-018-N1\"], \"text\": \"The GPU clock frequency was not measured, so the specific impact on GPU performance at 82 °C is unverified.\"}, {\"field\": \"other\", \"source_ids\": [\"FL-018-N1\"], \"text\": \"No maintenance or parts use was recorded, so it is unclear if any prior interventions affected the current thermal behavior.\"}]}",
+  "output_sha256": "795dce6d2964aaaded86aab08bc8ed9515ba633219aa938d5b25342fd16b5e3f",
+  "report": {
+    "equipment_id": {
+      "state": "known",
+      "value": "GW-18",
+      "source_ids": [
+        "FL-018-N1"
+      ]
+    },
+    "observations": [
+      {
+        "text": "Gateway GW-18 uses a Raspberry Pi 4 Model B with default thermal settings.",
+        "source_ids": [
+          "FL-018-N1"
+        ]
+      },
+      {
+        "text": "During observation, the SoC temperature rose to 82 degrees Celsius.",
+        "source_ids": [
+          "FL-018-N1"
+        ]
+      },
+      {
+        "text": "The Arm clock decreased during the high-temperature event.",
+        "source_ids": [
+          "FL-018-N1"
+        ]
+      },
+      {
+        "text": "The GPU clock was not measured.",
+        "source_ids": [
+          "FL-018-N1"
+        ]
+      },
+      {
+        "text": "Raspberry Pi thermal guidance indicates that in the 80–85 °C range, Arm cores are progressively throttled.",
+        "source_ids": [
+          "FL-018-N2"
+        ]
+      },
+      {
+        "text": "At 85 °C, both Arm cores and the GPU are throttled.",
+        "source_ids": [
+          "FL-018-N2"
+        ]
+      }
+    ],
+    "completed_work": [],
+    "parts_used": {
+      "state": "none",
+      "items": [],
+      "source_ids": [
+        "FL-018-N1"
+      ]
+    },
+    "proposed_actions": [
+      {
+        "text": "Monitor thermal performance to ensure temperatures do not reach 85 °C, which would trigger GPU throttling in addition to Arm throttling.",
+        "source_ids": [
+          "FL-018-N2"
+        ],
+        "basis": "source"
+      }
+    ],
+    "uncertainties": [
+      {
+        "text": "The GPU clock frequency was not measured, so the specific impact on GPU performance at 82 °C is unverified.",
+        "source_ids": [
+          "FL-018-N1"
+        ],
+        "field": "other"
+      },
+      {
+        "text": "No maintenance or parts use was recorded, so it is unclear if any prior interventions affected the current thermal behavior.",
+        "source_ids": [
+          "FL-018-N1"
+        ],
+        "field": "other"
+      }
+    ],
+    "priority": {
+      "state": "unknown",
+      "value": null,
+      "source_ids": [
+        "FL-018-N1",
+        "FL-018-N2"
+      ]
+    },
+    "next_service_date": {
+      "state": "unknown",
+      "value": null,
+      "source_ids": [
+        "FL-018-N1"
+      ]
+    }
+  }
+}

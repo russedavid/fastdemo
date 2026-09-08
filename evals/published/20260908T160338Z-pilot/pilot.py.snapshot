@@ -1,0 +1,180 @@
+"""Frozen, paired Groq report-component pilot; no automatic model retries."""
+
+import argparse
+import asyncio
+import hashlib
+import json
+import os
+import random
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+import httpx
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from evals.run_reports import source_items
+from groq_service import BASE, MODEL, report_request
+from reporting import parse_report, source_texts_from_items
+
+CORPUS = ROOT / "evals/corpus/pilot-v1.jsonl"
+MANIFEST = ROOT / "evals/corpus/pilot-v1.manifest.json"
+
+
+def sha(value):
+    if not isinstance(value, bytes):
+        value = json.dumps(value, sort_keys=True, ensure_ascii=False).encode()
+    return hashlib.sha256(value).hexdigest()
+
+
+def load_corpus(path=CORPUS):
+    cases = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    if len({c["id"] for c in cases}) != len(cases):
+        raise ValueError("Duplicate case IDs")
+    for case in cases:
+        ids = {s["id"] for s in case["sources"]}
+        if len(ids) != len(case["sources"]):
+            raise ValueError("Duplicate source IDs")
+        if case["split"] != "development":
+            raise ValueError("This pilot is development data; no holdout claim is allowed")
+        if case["provenance"]["independent_human_review"]:
+            raise ValueError("Initial pilot references are not human-reviewed")
+        for item in list(case["reference"]["fields"].values()) + case["reference"]["statements"] + case["reference"]["proposals"]:
+            if not set(item["source_ids"]) <= ids:
+                raise ValueError("Reference cites a source outside the case")
+    return cases
+
+
+def prepare_requests(cases):
+    minimal = (ROOT / "evals/minimal-report-instructions.txt").read_text()
+    prepared = []
+    # Keep comparisons adjacent and alternate the first arm across case blocks.
+    for i, case in enumerate(cases):
+        items = source_items(case)
+        deployed = report_request(items)
+        baseline = json.loads(json.dumps(deployed))
+        baseline["messages"][0]["content"] = minimal
+        order = [("deployed", deployed), ("minimal", baseline)]
+        if i % 2:
+            order.reverse()
+        for variant, request in order:
+            trace_id = case["id"] + "-" + variant
+            prepared.append({
+                "trace_id": trace_id, "case_id": case["id"], "variant": variant,
+                "input_sources": case["sources"], "source_items": items, "request": request,
+                "request_sha256": sha(request), "source_sha256": sha(case["sources"]),
+            })
+    return prepared
+
+
+def read_key(path=None):
+    key = os.getenv("GROQ_API_KEY", "")
+    if path:
+        for line in path.read_text().splitlines():
+            if line.startswith("GROQ_API_KEY="):
+                key = line.split("=", 1)[1].strip().strip("'\"")
+    if not key:
+        raise ValueError("GROQ_API_KEY is missing")
+    return key
+
+
+def save(path, data, secret=""):
+    text = json.dumps(data, indent=2, ensure_ascii=False)
+    if secret:
+        text = text.replace(secret, "[REDACTED]")
+    path.write_text(text + "\n")
+
+
+async def execute(args):
+    if args.interval < 65:
+        raise ValueError("Keep at least 65 seconds between requests for the observed Free-tier output limit")
+    cases = load_corpus()
+    if sha(CORPUS.read_bytes()) != json.loads(MANIFEST.read_text())["dataset_sha256"]:
+        raise ValueError("Corpus bytes do not match the versioned manifest")
+    requests = prepare_requests(cases)
+    output = args.output or ROOT / "evals/runs" / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-pilot")
+    output.mkdir(parents=True, exist_ok=False)
+    manifest = {
+        "name": "frontline-pilot-v1", "started_at": datetime.now(timezone.utc).isoformat(),
+        "scope": "Report-generation component only; no live audio, image, retrieval, or UI claims.",
+        "method": "Paired prompts with identical sources, schema, validation, model, temperature, reasoning mode, and output cap. Alternating arm order.",
+        "provider": "groq", "model": MODEL, "status": "prepared" if args.prepare else "running",
+        "interval_seconds": args.interval, "planned_requests": len(requests), "attempted": 0, "completed": [],
+        "label_status": "Provisional AI-authored reference fields; no human semantic judgments yet.",
+        "artifacts": {},
+    }
+    for name in ("evals/corpus/pilot-v1.jsonl", "evals/corpus/pilot-v1.manifest.json",
+                 "evals/minimal-report-instructions.txt", "report-instructions.txt",
+                 "reporting.py", "groq_service.py", "evals/pilot.py"):
+        value = (ROOT / name).read_bytes()
+        manifest["artifacts"][name] = sha(value)
+        (output / (Path(name).name + ".snapshot")).write_bytes(value)
+    save(output / "prepared-requests.json", requests)
+    review_order = [item["trace_id"] for item in requests]
+    random.Random(20260908).shuffle(review_order)
+    save(output / "review-order.json", review_order)
+    save(output / "manifest.json", manifest)
+    print("Prepared " + str(len(requests)) + " requests in " + str(output), flush=True)
+    if args.prepare:
+        return output
+    key = read_key(args.credentials)
+    last_started = None
+    async with httpx.AsyncClient(timeout=90, headers={"Authorization": "Bearer " + key, "User-Agent": "Frontline-Evaluation/0.1"}) as client:
+        for item in requests:
+            if last_started is not None:
+                await asyncio.sleep(max(0, args.interval - (time.monotonic() - last_started)))
+            record = {k: v for k, v in item.items() if k != "source_items"}
+            record["started_at"] = datetime.now(timezone.utc).isoformat()
+            manifest["attempted"] += 1
+            save(output / "manifest.json", manifest)
+            last_started = time.monotonic()
+            try:
+                response = await client.post(BASE + "/chat/completions", json=item["request"])
+                record["elapsed_seconds"] = round(time.monotonic() - last_started, 4)
+                record["http_status"] = response.status_code
+                record["response_body"] = response.text.replace(key, "[REDACTED]")
+                record["response_sha256"] = sha(response.content)
+                record["rate_headers"] = {k: v for k, v in response.headers.items() if k.startswith("x-ratelimit-") or k == "retry-after"}
+                record["structural_status"] = "provider_error"
+                if response.status_code == 200:
+                    data = response.json()
+                    record["usage"] = data.get("usage", {})
+                    record["returned_model"] = data.get("model")
+                    choice = data["choices"][0]
+                    record["finish_reason"] = choice.get("finish_reason")
+                    record["raw_output"] = choice["message"].get("content")
+                    record["output_sha256"] = sha(record["raw_output"])
+                    try:
+                        if record["finish_reason"] != "stop":
+                            raise ValueError("Truncated output")
+                        record["report"] = parse_report(record["raw_output"], source_texts_from_items(item["source_items"]))
+                        record["structural_status"] = "accepted"
+                    except (ValueError, TypeError, KeyError, IndexError) as error:
+                        record["structural_status"] = "rejected"
+                        record["validation_error"] = str(error)
+            except (httpx.HTTPError, ValueError, KeyError, IndexError) as error:
+                record["structural_status"] = "execution_error"
+                record["error_type"] = type(error).__name__
+            save(output / (item["trace_id"] + ".json"), record, key)
+            manifest["completed"].append(item["trace_id"])
+            save(output / "manifest.json", manifest)
+            print(f'{len(manifest["completed"])}/{len(requests)} {item["trace_id"]}: {record["structural_status"]}', flush=True)
+            if record["structural_status"] in ("provider_error", "execution_error"):
+                manifest["status"] = "stopped_after_provider_error"
+                break
+        else:
+            manifest["status"] = "finished"
+    manifest["finished_at"] = datetime.now(timezone.utc).isoformat()
+    save(output / "manifest.json", manifest)
+    return output
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--credentials", type=Path)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--interval", type=int, default=65)
+    parser.add_argument("--prepare", action="store_true")
+    asyncio.run(execute(parser.parse_args()))

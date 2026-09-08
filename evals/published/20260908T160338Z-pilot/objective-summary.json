@@ -1,0 +1,206 @@
+{
+  "run": "20260908T160338Z-pilot",
+  "planned_requests": 40,
+  "completed_requests": 40,
+  "status": "finished",
+  "reference_status": "Provisional AI-authored expectations, not human gold labels",
+  "semantic_evaluation": "pending_human_review",
+  "human_reviewed_traces": 0,
+  "criteria_version": null,
+  "reviewer": null,
+  "variants": {
+    "deployed": {
+      "traces": 20,
+      "structure": {
+        "accepted": 19,
+        "provider_schema_rejection": 1
+      },
+      "fields": {
+        "equipment_id": {
+          "pass": 20
+        },
+        "priority": {
+          "pass": 19,
+          "unavailable": 1
+        },
+        "next_service_date": {
+          "pass": 20
+        },
+        "parts_used": {
+          "pass": 16,
+          "fail": 3,
+          "unavailable": 1
+        }
+      },
+      "fields_by_expected_state": {
+        "equipment_id": {
+          "known": {
+            "pass": 18
+          },
+          "unknown": {
+            "pass": 2
+          }
+        },
+        "priority": {
+          "unknown": {
+            "pass": 17,
+            "unavailable": 1
+          },
+          "known": {
+            "pass": 1
+          },
+          "conflicting": {
+            "pass": 1
+          }
+        },
+        "next_service_date": {
+          "unknown": {
+            "pass": 19
+          },
+          "known": {
+            "pass": 1
+          }
+        },
+        "parts_used": {
+          "known": {
+            "pass": 5
+          },
+          "none": {
+            "pass": 8
+          },
+          "unknown": {
+            "pass": 2,
+            "fail": 3,
+            "unavailable": 1
+          },
+          "conflicting": {
+            "pass": 1
+          }
+        }
+      },
+      "human": {
+        "unreviewed": 20
+      },
+      "latencies": [
+        1.2098,
+        1.1046,
+        0.98,
+        1.3069,
+        1.1635,
+        1.043,
+        0.9744,
+        1.0232,
+        0.9952,
+        0.9897,
+        1.2529,
+        1.2385,
+        0.9415,
+        0.8998,
+        1.3265,
+        0.999,
+        0.8955,
+        1.1042,
+        2.0756,
+        1.2828
+      ],
+      "tokens_reported": 39552,
+      "traces_with_usage": 19,
+      "traces_missing_usage": 1
+    },
+    "minimal": {
+      "traces": 20,
+      "structure": {
+        "accepted": 19,
+        "rejected": 1
+      },
+      "fields": {
+        "equipment_id": {
+          "pass": 20
+        },
+        "priority": {
+          "pass": 20
+        },
+        "next_service_date": {
+          "pass": 20
+        },
+        "parts_used": {
+          "pass": 13,
+          "fail": 7
+        }
+      },
+      "fields_by_expected_state": {
+        "equipment_id": {
+          "known": {
+            "pass": 18
+          },
+          "unknown": {
+            "pass": 2
+          }
+        },
+        "priority": {
+          "unknown": {
+            "pass": 18
+          },
+          "known": {
+            "pass": 1
+          },
+          "conflicting": {
+            "pass": 1
+          }
+        },
+        "next_service_date": {
+          "unknown": {
+            "pass": 19
+          },
+          "known": {
+            "pass": 1
+          }
+        },
+        "parts_used": {
+          "known": {
+            "pass": 4,
+            "fail": 1
+          },
+          "none": {
+            "pass": 8
+          },
+          "unknown": {
+            "fail": 6
+          },
+          "conflicting": {
+            "pass": 1
+          }
+        }
+      },
+      "human": {
+        "unreviewed": 20
+      },
+      "latencies": [
+        0.9328,
+        1.0412,
+        0.9664,
+        1.4263,
+        1.2578,
+        0.9486,
+        1.0034,
+        1.024,
+        1.0893,
+        0.8735,
+        1.1141,
+        1.1875,
+        1.0627,
+        1.1412,
+        1.2045,
+        0.7864,
+        0.8339,
+        1.5086,
+        1.3406,
+        1.4597
+      ],
+      "tokens_reported": 31859,
+      "traces_with_usage": 20,
+      "traces_missing_usage": 0
+    }
+  },
+  "limitation": "Four field checks and structural acceptance cannot establish report faithfulness or fact coverage. No overall quality score is calculated."
+}

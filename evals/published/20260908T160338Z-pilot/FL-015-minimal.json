@@ -1,0 +1,533 @@
+{
+  "trace_id": "FL-015-minimal",
+  "case_id": "FL-015",
+  "variant": "minimal",
+  "input_sources": [
+    {
+      "id": "FL-015-N1",
+      "text": "WO-315, unit LGT-5, visit 2026-08-25 at 11:00: replaced two FUS-2 fuses. This is the complete parts count for the visit.",
+      "type": "field_note"
+    },
+    {
+      "id": "FL-015-N2",
+      "text": "Copied entry, not a second visit: WO-315, unit LGT-5, visit 2026-08-25 at 11:00: replaced two FUS-2 fuses. This is the complete parts count for the visit.",
+      "type": "field_note"
+    }
+  ],
+  "request": {
+    "model": "qwen/qwen3.8-27b",
+    "temperature": 0.3,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Write a faithful maintenance report from the supplied source packet. Summarize the important observations, work performed, parts used, proposed actions, and unresolved information. Cite the source IDs for the information you report. Use the supplied JSON schema and return only the JSON object.\n"
+      },
+      {
+        "role": "user",
+        "content": "SOURCE PACKET\n{\"id\": \"FL-015-N1\", \"type\": \"field_note\"}\nWO-315, unit LGT-5, visit 2026-08-25 at 11:00: replaced two FUS-2 fuses. This is the complete parts count for the visit.\n\n{\"id\": \"FL-015-N2\", \"type\": \"field_note\"}\nCopied entry, not a second visit: WO-315, unit LGT-5, visit 2026-08-25 at 11:00: replaced two FUS-2 fuses. This is the complete parts count for the visit.\n\nRESPONSE JSON SCHEMA\n{\"$defs\":{\"Claim\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-015-N1\",\"FL-015-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"text\",\"source_ids\"],\"title\":\"Claim\",\"type\":\"object\"},\"EvidenceValue\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-015-N1\",\"FL-015-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"EvidenceValue\",\"type\":\"object\"},\"Part\":{\"additionalProperties\":false,\"properties\":{\"part_number\":{\"minLength\":1,\"title\":\"Part Number\",\"type\":\"string\"},\"quantity\":{\"anyOf\":[{\"exclusiveMinimum\":0,\"type\":\"integer\"},{\"type\":\"null\"}],\"title\":\"Quantity\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-015-N1\",\"FL-015-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"part_number\",\"quantity\",\"source_ids\"],\"title\":\"Part\",\"type\":\"object\"},\"PartsUsed\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"none\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"items\":{\"items\":{\"$ref\":\"#/$defs/Part\"},\"title\":\"Items\",\"type\":\"array\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-015-N1\",\"FL-015-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"items\",\"source_ids\"],\"title\":\"PartsUsed\",\"type\":\"object\"},\"Priority\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"enum\":[\"low\",\"medium\",\"high\",\"critical\"],\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-015-N1\",\"FL-015-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"Priority\",\"type\":\"object\"},\"ProposedAction\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-015-N1\",\"FL-015-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"},\"basis\":{\"enum\":[\"source\",\"clarification\"],\"title\":\"Basis\",\"type\":\"string\"}},\"required\":[\"text\",\"source_ids\",\"basis\"],\"title\":\"ProposedAction\",\"type\":\"object\"},\"ServiceDate\":{\"additionalProperties\":false,\"properties\":{\"state\":{\"enum\":[\"known\",\"unknown\",\"conflicting\"],\"title\":\"State\",\"type\":\"string\"},\"value\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Value\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-015-N1\",\"FL-015-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"}},\"required\":[\"state\",\"value\",\"source_ids\"],\"title\":\"ServiceDate\",\"type\":\"object\"},\"Uncertainty\":{\"additionalProperties\":false,\"properties\":{\"text\":{\"minLength\":1,\"title\":\"Text\",\"type\":\"string\"},\"source_ids\":{\"items\":{\"type\":\"string\",\"enum\":[\"FL-015-N1\",\"FL-015-N2\"]},\"minItems\":1,\"title\":\"Source Ids\",\"type\":\"array\"},\"field\":{\"enum\":[\"equipment_id\",\"parts_used\",\"priority\",\"next_service_date\",\"other\"],\"title\":\"Field\",\"type\":\"string\"}},\"required\":[\"text\",\"source_ids\",\"field\"],\"title\":\"Uncertainty\",\"type\":\"object\"}},\"additionalProperties\":false,\"properties\":{\"equipment_id\":{\"$ref\":\"#/$defs/EvidenceValue\",\"description\":\"Exact equipment identifier copied verbatim. Put revision, location, and explanatory text in observations, not in this value.\"},\"observations\":{\"items\":{\"$ref\":\"#/$defs/Claim\"},\"minItems\":1,\"title\":\"Observations\",\"type\":\"array\"},\"completed_work\":{\"items\":{\"$ref\":\"#/$defs/Claim\"},\"title\":\"Completed Work\",\"type\":\"array\"},\"parts_used\":{\"$ref\":\"#/$defs/PartsUsed\"},\"proposed_actions\":{\"items\":{\"$ref\":\"#/$defs/ProposedAction\"},\"title\":\"Proposed Actions\",\"type\":\"array\"},\"uncertainties\":{\"items\":{\"$ref\":\"#/$defs/Uncertainty\"},\"title\":\"Uncertainties\",\"type\":\"array\"},\"priority\":{\"$ref\":\"#/$defs/Priority\"},\"next_service_date\":{\"$ref\":\"#/$defs/ServiceDate\"}},\"required\":[\"equipment_id\",\"observations\",\"completed_work\",\"parts_used\",\"proposed_actions\",\"uncertainties\",\"priority\",\"next_service_date\"],\"title\":\"Report\",\"type\":\"object\"}"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "frontline_report",
+        "strict": true,
+        "schema": {
+          "$defs": {
+            "Claim": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-015-N1",
+                      "FL-015-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids"
+              ],
+              "title": "Claim",
+              "type": "object"
+            },
+            "EvidenceValue": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-015-N1",
+                      "FL-015-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "EvidenceValue",
+              "type": "object"
+            },
+            "Part": {
+              "additionalProperties": false,
+              "properties": {
+                "part_number": {
+                  "minLength": 1,
+                  "title": "Part Number",
+                  "type": "string"
+                },
+                "quantity": {
+                  "anyOf": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Quantity"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-015-N1",
+                      "FL-015-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "part_number",
+                "quantity",
+                "source_ids"
+              ],
+              "title": "Part",
+              "type": "object"
+            },
+            "PartsUsed": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "none",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "items": {
+                  "items": {
+                    "$ref": "#/$defs/Part"
+                  },
+                  "title": "Items",
+                  "type": "array"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-015-N1",
+                      "FL-015-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "items",
+                "source_ids"
+              ],
+              "title": "PartsUsed",
+              "type": "object"
+            },
+            "Priority": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-015-N1",
+                      "FL-015-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "Priority",
+              "type": "object"
+            },
+            "ProposedAction": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-015-N1",
+                      "FL-015-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                },
+                "basis": {
+                  "enum": [
+                    "source",
+                    "clarification"
+                  ],
+                  "title": "Basis",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids",
+                "basis"
+              ],
+              "title": "ProposedAction",
+              "type": "object"
+            },
+            "ServiceDate": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "enum": [
+                    "known",
+                    "unknown",
+                    "conflicting"
+                  ],
+                  "title": "State",
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Value"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-015-N1",
+                      "FL-015-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "state",
+                "value",
+                "source_ids"
+              ],
+              "title": "ServiceDate",
+              "type": "object"
+            },
+            "Uncertainty": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "title": "Text",
+                  "type": "string"
+                },
+                "source_ids": {
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FL-015-N1",
+                      "FL-015-N2"
+                    ]
+                  },
+                  "minItems": 1,
+                  "title": "Source Ids",
+                  "type": "array"
+                },
+                "field": {
+                  "enum": [
+                    "equipment_id",
+                    "parts_used",
+                    "priority",
+                    "next_service_date",
+                    "other"
+                  ],
+                  "title": "Field",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "source_ids",
+                "field"
+              ],
+              "title": "Uncertainty",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "equipment_id": {
+              "$ref": "#/$defs/EvidenceValue",
+              "description": "Exact equipment identifier copied verbatim. Put revision, location, and explanatory text in observations, not in this value."
+            },
+            "observations": {
+              "items": {
+                "$ref": "#/$defs/Claim"
+              },
+              "minItems": 1,
+              "title": "Observations",
+              "type": "array"
+            },
+            "completed_work": {
+              "items": {
+                "$ref": "#/$defs/Claim"
+              },
+              "title": "Completed Work",
+              "type": "array"
+            },
+            "parts_used": {
+              "$ref": "#/$defs/PartsUsed"
+            },
+            "proposed_actions": {
+              "items": {
+                "$ref": "#/$defs/ProposedAction"
+              },
+              "title": "Proposed Actions",
+              "type": "array"
+            },
+            "uncertainties": {
+              "items": {
+                "$ref": "#/$defs/Uncertainty"
+              },
+              "title": "Uncertainties",
+              "type": "array"
+            },
+            "priority": {
+              "$ref": "#/$defs/Priority"
+            },
+            "next_service_date": {
+              "$ref": "#/$defs/ServiceDate"
+            }
+          },
+          "required": [
+            "equipment_id",
+            "observations",
+            "completed_work",
+            "parts_used",
+            "proposed_actions",
+            "uncertainties",
+            "priority",
+            "next_service_date"
+          ],
+          "title": "Report",
+          "type": "object"
+        }
+      }
+    },
+    "max_completion_tokens": 768,
+    "reasoning_effort": "none"
+  },
+  "request_sha256": "97890d728fb0b4986f4dc4d5c9605be39cc4a5f94e1d3fd70a7bb441ac33fd4f",
+  "source_sha256": "522dfc59fa230bf39949bf9a056737249b17ce64f58bf66afa539f6c268dfac0",
+  "started_at": "2026-09-08T16:35:03.968906+00:00",
+  "elapsed_seconds": 1.2045,
+  "http_status": 200,
+  "response_body": "{\"id\":\"chatcmpl-f209d0b2-2c73-4d1e-a181-14b558b11aa1\",\"object\":\"chat.completion\",\"created\":1788885305,\"model\":\"qwen/qwen3.8-27b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"completed_work\\\": [{\\\"source_ids\\\": [\\\"FL-015-N1\\\", \\\"FL-015-N2\\\"], \\\"text\\\": \\\"Replaced two FUS-2 fuses.\\\"}], \\\"equipment_id\\\": {\\\"source_ids\\\": [\\\"FL-015-N1\\\", \\\"FL-015-N2\\\"], \\\"state\\\": \\\"known\\\", \\\"value\\\": \\\"LGT-5\\\"}, \\\"next_service_date\\\": {\\\"source_ids\\\": [\\\"FL-015-N1\\\", \\\"FL-015-N2\\\"], \\\"state\\\": \\\"unknown\\\", \\\"value\\\": null}, \\\"observations\\\": [{\\\"source_ids\\\": [\\\"FL-015-N1\\\", \\\"FL-015-N2\\\"], \\\"text\\\": \\\"Service visit occurred on 2026-08-25 at 11:00 under work order WO-315.\\\"}, {\\\"source_ids\\\": [\\\"FL-015-N2\\\"], \\\"text\\\": \\\"Source FL-015-N2 is identified as a copied entry of the same visit, not a separate event.\\\"}], \\\"parts_used\\\": {\\\"items\\\": [{\\\"part_number\\\": \\\"FUS-2\\\", \\\"quantity\\\": 2, \\\"source_ids\\\": [\\\"FL-015-N1\\\", \\\"FL-015-N2\\\"]}], \\\"source_ids\\\": [\\\"FL-015-N1\\\", \\\"FL-015-N2\\\"], \\\"state\\\": \\\"known\\\"}, \\\"priority\\\": {\\\"source_ids\\\": [\\\"FL-015-N1\\\", \\\"FL-015-N2\\\"], \\\"state\\\": \\\"unknown\\\", \\\"value\\\": null}, \\\"proposed_actions\\\": [], \\\"uncertainties\\\": [{\\\"field\\\": \\\"other\\\", \\\"source_ids\\\": [\\\"FL-015-N1\\\", \\\"FL-015-N2\\\"], \\\"text\\\": \\\"No priority, next service date, or proposed actions are specified in the source packet.\\\"}]}\"},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"queue_time\":0.102699061,\"prompt_tokens\":1324,\"prompt_time\":0.106650975,\"completion_tokens\":397,\"completion_time\":0.794362599,\"total_tokens\":1721,\"total_time\":0.901013574},\"usage_breakdown\":null,\"system_fingerprint\":\"fp_91b5e87adf\",\"x_groq\":{\"id\":\"req_01m20xz0x0e4xt1kgww6gctfbg\",\"seed\":1990644485},\"service_tier\":\"on_demand\"}\n",
+  "response_sha256": "a121843abe69a456022a952937c56780dd6d15fefa3a16a8d9462ea2a5d4cc8f",
+  "rate_headers": {
+    "x-ratelimit-limit-requests": "1000",
+    "x-ratelimit-limit-tokens": "8000",
+    "x-ratelimit-remaining-requests": "970",
+    "x-ratelimit-remaining-tokens": "5908",
+    "x-ratelimit-reset-requests": "43m12s",
+    "x-ratelimit-reset-tokens": "15.69s"
+  },
+  "structural_status": "accepted",
+  "usage": {
+    "queue_time": 0.102699061,
+    "prompt_tokens": 1324,
+    "prompt_time": 0.106650975,
+    "completion_tokens": 397,
+    "completion_time": 0.794362599,
+    "total_tokens": 1721,
+    "total_time": 0.901013574
+  },
+  "returned_model": "qwen/qwen3.8-27b",
+  "finish_reason": "stop",
+  "raw_output": "{\"completed_work\": [{\"source_ids\": [\"FL-015-N1\", \"FL-015-N2\"], \"text\": \"Replaced two FUS-2 fuses.\"}], \"equipment_id\": {\"source_ids\": [\"FL-015-N1\", \"FL-015-N2\"], \"state\": \"known\", \"value\": \"LGT-5\"}, \"next_service_date\": {\"source_ids\": [\"FL-015-N1\", \"FL-015-N2\"], \"state\": \"unknown\", \"value\": null}, \"observations\": [{\"source_ids\": [\"FL-015-N1\", \"FL-015-N2\"], \"text\": \"Service visit occurred on 2026-08-25 at 11:00 under work order WO-315.\"}, {\"source_ids\": [\"FL-015-N2\"], \"text\": \"Source FL-015-N2 is identified as a copied entry of the same visit, not a separate event.\"}], \"parts_used\": {\"items\": [{\"part_number\": \"FUS-2\", \"quantity\": 2, \"source_ids\": [\"FL-015-N1\", \"FL-015-N2\"]}], \"source_ids\": [\"FL-015-N1\", \"FL-015-N2\"], \"state\": \"known\"}, \"priority\": {\"source_ids\": [\"FL-015-N1\", \"FL-015-N2\"], \"state\": \"unknown\", \"value\": null}, \"proposed_actions\": [], \"uncertainties\": [{\"field\": \"other\", \"source_ids\": [\"FL-015-N1\", \"FL-015-N2\"], \"text\": \"No priority, next service date, or proposed actions are specified in the source packet.\"}]}",
+  "output_sha256": "512a95a39987172c00e112cb0dfa2e01805b4f54503ea147ec364bb7330584bd",
+  "report": {
+    "equipment_id": {
+      "state": "known",
+      "value": "LGT-5",
+      "source_ids": [
+        "FL-015-N1",
+        "FL-015-N2"
+      ]
+    },
+    "observations": [
+      {
+        "text": "Service visit occurred on 2026-08-25 at 11:00 under work order WO-315.",
+        "source_ids": [
+          "FL-015-N1",
+          "FL-015-N2"
+        ]
+      },
+      {
+        "text": "Source FL-015-N2 is identified as a copied entry of the same visit, not a separate event.",
+        "source_ids": [
+          "FL-015-N2"
+        ]
+      }
+    ],
+    "completed_work": [
+      {
+        "text": "Replaced two FUS-2 fuses.",
+        "source_ids": [
+          "FL-015-N1",
+          "FL-015-N2"
+        ]
+      }
+    ],
+    "parts_used": {
+      "state": "known",
+      "items": [
+        {
+          "part_number": "FUS-2",
+          "quantity": 2,
+          "source_ids": [
+            "FL-015-N1",
+            "FL-015-N2"
+          ]
+        }
+      ],
+      "source_ids": [
+        "FL-015-N1",
+        "FL-015-N2"
+      ]
+    },
+    "proposed_actions": [],
+    "uncertainties": [
+      {
+        "text": "No priority, next service date, or proposed actions are specified in the source packet.",
+        "source_ids": [
+          "FL-015-N1",
+          "FL-015-N2"
+        ],
+        "field": "other"
+      }
+    ],
+    "priority": {
+      "state": "unknown",
+      "value": null,
+      "source_ids": [
+        "FL-015-N1",
+        "FL-015-N2"
+      ]
+    },
+    "next_service_date": {
+      "state": "unknown",
+      "value": null,
+      "source_ids": [
+        "FL-015-N1",
+        "FL-015-N2"
+      ]
+    }
+  }
+}
