@@ -1,0 +1,25 @@
+{
+  "name": "frontline-reference-passages-v1",
+  "source_version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f",
+  "passages": 9,
+  "dataset_sha256": "9c74147f5d529ea2f0e73e913aa360e80a3d35dcad2ff9162a7852e5126a37a7",
+  "sources": {
+    "frequency": {
+      "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc",
+      "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f",
+      "sha256": "c2a9141b012abdb2bdd53627e80a72e2077889abcd1d2bba0cf5d2cc42c43e7c",
+      "license": "CC-BY-SA-4.0",
+      "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant."
+    },
+    "power": {
+      "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/power-supplies.adoc",
+      "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f",
+      "sha256": "49f6478c1c0164237ebcf1d28aac4709e843d2b5c06442539bacae05e49eafb1",
+      "license": "CC-BY-SA-4.0",
+      "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant."
+    }
+  },
+  "scope": "Curated manufacturer-reference summaries; no real maintenance records. Applicability metadata and summaries are assistant-authored.",
+  "split": "development",
+  "license": "CC-BY-SA-4.0"
+}

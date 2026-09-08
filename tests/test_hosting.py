@@ -144,6 +144,39 @@ class HostingTests(unittest.TestCase):
         self.assertIn("Demo quota reached", self.client.get("/generation/" + job.id).text)
         self.assertEqual(len(self.app.maintenance_reports()), 1)
 
+    def test_reference_example_retrieves_and_snapshots_guidance_before_generation(self):
+        self.client.post("/demo/reference-example")
+        workspace = next(w for w in self.app.workspaces() if w.id != self.workspace.id)
+        captured = []
+        async def generate(items, actor):
+            sources = [json.loads(item["transcription"].partition("\n")[0]) for item in items]
+            captured.extend(sources)
+            note_id = sources[0]["id"]
+            reference_id = next(s["id"] for s in sources if s.get("reference_id") == "RP-PI5-FAN")
+            unknown = {"state": "unknown", "value": None, "source_ids": [note_id]}
+            result = {"equipment_id": {"state": "known", "value": "GW-19", "source_ids": [note_id]},
+                      "observations": [{"text": "The fan stayed off during warm-up.", "source_ids": [note_id]},
+                                       {"text": "The reference describes the default fan threshold.", "source_ids": [reference_id]}],
+                      "completed_work": [], "parts_used": {"state": "unknown", "items": [], "source_ids": [note_id]},
+                      "proposed_actions": [], "uncertainties": [], "priority": unknown, "next_service_date": unknown}
+            return result, {"model": "offline-fixture", "usage": {}}
+        with patch.object(self.app.groq, "generate", side_effect=generate):
+            self.client.post("/content/generate-report", data={"workspace_id": workspace.id})
+            deadline = time.monotonic() + 2
+            while self.app.generations()[0].status in ("queued", "running") and time.monotonic() < deadline:
+                time.sleep(.01)
+        job = self.app.generations()[0]
+        self.assertEqual(job.status, "done", job.error)
+        report = self.app.maintenance_reports[job.report_id]
+        trace = json.loads(report.retrieval_json)
+        self.assertIn("RP-PI5-FAN", trace["selected_ids"])
+        self.assertTrue(any(s.get("evidence_role") == "reference" for s in captured))
+        page = self.client.get("/content/view-report/" + report.id).text
+        self.assertIn("Reference guidance", page)
+        self.assertIn("Read the original documentation", page)
+        self.assertNotIn("No completed work is established", page)
+        self.assertEqual(json.loads(job.retrieval_json)["corpus_sha256"], trace["corpus_sha256"])
+
     def test_expired_demo_removes_only_that_visitors_data(self):
         from starlette.testclient import TestClient
         self.app.users.update({"demo_expires_at": "2000-01-01T00:00:00+00:00"}, self.user.id)

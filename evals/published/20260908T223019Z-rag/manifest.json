@@ -1,0 +1,33 @@
+{
+  "name": "frontline-rag-development-v1",
+  "started_at": "2026-09-08T22:30:19.530347+00:00",
+  "scope": "Retrieval plus report generation from supplied synthetic texts; compact source IDs; no live audio/image or production accuracy claim.",
+  "method": "Four frozen requests after deterministic retrieval, including unavailable and ambiguous context.",
+  "provider": "groq",
+  "model": "qwen/qwen3.8-27b",
+  "planned_requests": 4,
+  "attempted": 4,
+  "completed": [
+    "RG-001-current",
+    "RG-002-current",
+    "RG-003-current",
+    "RG-004-current"
+  ],
+  "interval_seconds": 65,
+  "selected_variant": "current",
+  "continue_schema_errors": true,
+  "label_status": "No human labels; assistant review follows generation",
+  "artifacts": {
+    "reporting.py": "80100c6e8099fcbd254c20b9f5e0892bdeefb0367aea78fb5f8c2cb689682d5d",
+    "report-instructions.txt": "bc60550b10025dfd2582a156def788e9357cd50ed463e872de18bd16ff1bbb8a",
+    "groq_service.py": "2cea76178687caac62bf35af6c136a43ad3524c9b3ecbb3ae3094eb686c5e434",
+    "retrieval.py": "189d7335b56c4e21f223d0c27a8f6129a1eaa7dd588808674cf7514fa429f7d5",
+    "report_views.py": "8385c14a06ca5ea69b9f419205c74ea5892784b96e4322cb60d5ae253141a8f3",
+    "evals/pilot.py": "f11e4dd2abb850aacb0a8e4b2369ee3a8d968c386f6da24408b2be675a1ab57b",
+    "evals/check_rag.py": "2c86d7e5e5e055fc272283f611452c60527e3e2ad41ea5fc6151e14bd66ebe26",
+    "reference-data/passages-v1.jsonl": "9c74147f5d529ea2f0e73e913aa360e80a3d35dcad2ff9162a7852e5126a37a7",
+    "reference-data/manifest.json": "9d631798f8f38a19e34d18cc3258347f2e08880bb2b6a29865a82ad1177b5794"
+  },
+  "status": "finished",
+  "finished_at": "2026-09-08T22:33:35.895765+00:00"
+}

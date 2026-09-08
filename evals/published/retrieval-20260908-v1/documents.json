@@ -1,0 +1,246 @@
+[
+  {
+    "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant.",
+    "id": "RP-THERMAL",
+    "keywords": "thermal temperature hot heat Arm CPU GPU clock frequency throttling slow performance",
+    "license": "CC-BY-SA-4.0",
+    "models": [
+      "raspberry-pi-3bplus",
+      "raspberry-pi-4",
+      "raspberry-pi-5"
+    ],
+    "owner_id": null,
+    "revision": null,
+    "section": "Frequency management and thermal control",
+    "sha256": "c2a9141b012abdb2bdd53627e80a72e2077889abcd1d2bba0cf5d2cc42c43e7c",
+    "status": "current",
+    "text": "Between 80 and 85 degrees Celsius, Raspberry Pi Arm cores progressively throttle. At 85 degrees Celsius, both Arm and GPU throttle. This describes thermal behavior, not a completed repair.",
+    "title": "Thermal throttling",
+    "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc",
+    "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f"
+  },
+  {
+    "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant.",
+    "id": "RP-PI5-FAN",
+    "keywords": "fan off spin start warm warming temperature default threshold speed",
+    "license": "CC-BY-SA-4.0",
+    "models": [
+      "raspberry-pi-5"
+    ],
+    "owner_id": null,
+    "revision": null,
+    "section": "Raspberry Pi 5 fans",
+    "sha256": "c2a9141b012abdb2bdd53627e80a72e2077889abcd1d2bba0cf5d2cc42c43e7c",
+    "status": "current",
+    "text": "Raspberry Pi 5 defaults keep the fan off below 50 degrees Celsius during warming. Speeds at 50, 60, 67.5, and 75 degrees Celsius are respectively 30%, 50%, 70%, and 100%. Configuration can change these defaults.",
+    "title": "Raspberry Pi 5 fan thresholds",
+    "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc",
+    "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f"
+  },
+  {
+    "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant.",
+    "id": "RP-PI5-HYST",
+    "keywords": "fan cooling falling temperature cool down hysteresis threshold remains running",
+    "license": "CC-BY-SA-4.0",
+    "models": [
+      "raspberry-pi-5"
+    ],
+    "owner_id": null,
+    "revision": null,
+    "section": "Raspberry Pi 5 fans",
+    "sha256": "c2a9141b012abdb2bdd53627e80a72e2077889abcd1d2bba0cf5d2cc42c43e7c",
+    "status": "current",
+    "text": "As Raspberry Pi 5 cools, fan-speed reductions occur 5 degrees Celsius below the warming thresholds. This hysteresis and the speed thresholds are configurable.",
+    "title": "Raspberry Pi 5 fan hysteresis",
+    "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc",
+    "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f"
+  },
+  {
+    "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant.",
+    "id": "RP-TEMPERATURE",
+    "keywords": "temperature measurement sensor Linux reading vcgencmd measure_temp GPU",
+    "license": "CC-BY-SA-4.0",
+    "models": [
+      "raspberry-pi-3bplus",
+      "raspberry-pi-4",
+      "raspberry-pi-5"
+    ],
+    "owner_id": null,
+    "revision": null,
+    "section": "Measure temperatures",
+    "sha256": "c2a9141b012abdb2bdd53627e80a72e2077889abcd1d2bba0cf5d2cc42c43e7c",
+    "status": "current",
+    "text": "The documented vcgencmd measure_temp command reads the current SoC temperature through the GPU. Linux temperature readings can differ because of the monitoring implementation.",
+    "title": "Reading SoC temperature",
+    "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc",
+    "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f"
+  },
+  {
+    "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant.",
+    "id": "RP-PI3-SOFT",
+    "keywords": "thermal temperature soft limit clock frequency Arm CPU 60 throttling",
+    "license": "CC-BY-SA-4.0",
+    "models": [
+      "raspberry-pi-3bplus"
+    ],
+    "owner_id": null,
+    "revision": null,
+    "section": "Frequency management and thermal control",
+    "sha256": "c2a9141b012abdb2bdd53627e80a72e2077889abcd1d2bba0cf5d2cc42c43e7c",
+    "status": "current",
+    "text": "Raspberry Pi 3 Model B+ has a configurable 60-degree-Celsius soft limit. Reaching it reduces the clock from 1.4 to 1.2 GHz; the hard limit remains 85 degrees Celsius.",
+    "title": "Raspberry Pi 3 Model B+ soft limit",
+    "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc",
+    "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f"
+  },
+  {
+    "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant.",
+    "id": "RP-PI4-POWER",
+    "keywords": "power supply voltage current USB C adapter connector 3A",
+    "license": "CC-BY-SA-4.0",
+    "models": [
+      "raspberry-pi-4"
+    ],
+    "owner_id": null,
+    "revision": null,
+    "section": "Recommended power supplies",
+    "sha256": "49f6478c1c0164237ebcf1d28aac4709e843d2b5c06442539bacae05e49eafb1",
+    "status": "current",
+    "text": "Raspberry Pi 4 uses USB-C power. The documentation specifies a 5.1 V supply and recommends the 3 A USB-C supply for this model.",
+    "title": "Raspberry Pi 4 power supply",
+    "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/power-supplies.adoc",
+    "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f"
+  },
+  {
+    "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant.",
+    "id": "RP-PI5-USB",
+    "keywords": "USB peripheral current limit budget disk power supply 5A 3A 600mA 1.6A",
+    "license": "CC-BY-SA-4.0",
+    "models": [
+      "raspberry-pi-5"
+    ],
+    "owner_id": null,
+    "revision": null,
+    "section": "Typical power requirements",
+    "sha256": "49f6478c1c0164237ebcf1d28aac4709e843d2b5c06442539bacae05e49eafb1",
+    "status": "current",
+    "text": "With a supply capable of 5 A at 5 V, Raspberry Pi 5 provides 1.6 A to downstream USB peripherals. Other compatible supplies restrict that allowance to 600 mA. Connected peripherals share the available budget.",
+    "title": "Raspberry Pi 5 USB current budget",
+    "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/power-supplies.adoc",
+    "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f"
+  },
+  {
+    "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant.",
+    "id": "RP-LOW-VOLTAGE",
+    "keywords": "low voltage undervoltage warning kernel log power supply cable USB brownout",
+    "license": "CC-BY-SA-4.0",
+    "models": [
+      "raspberry-pi-3bplus",
+      "raspberry-pi-4",
+      "raspberry-pi-5"
+    ],
+    "owner_id": null,
+    "revision": null,
+    "section": "Power supply warnings",
+    "sha256": "49f6478c1c0164237ebcf1d28aac4709e843d2b5c06442539bacae05e49eafb1",
+    "status": "current",
+    "text": "The documented low-voltage detection threshold is 4.63 V with a 5% tolerance; detection creates a kernel-log entry. Peripheral demand, an inadequate supply, or cable resistance can cause voltage drops. A warning alone does not identify which cause applies.",
+    "title": "Low-voltage warnings",
+    "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/power-supplies.adoc",
+    "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f"
+  },
+  {
+    "attribution": "Raspberry Pi Ltd; passages summarized by the project assistant.",
+    "id": "RP-BACKPOWER",
+    "keywords": "USB hub back power backpower upstream powered protection surge",
+    "license": "CC-BY-SA-4.0",
+    "models": [
+      "raspberry-pi-3bplus",
+      "raspberry-pi-4",
+      "raspberry-pi-5"
+    ],
+    "owner_id": null,
+    "revision": null,
+    "section": "Back-powering",
+    "sha256": "49f6478c1c0164237ebcf1d28aac4709e843d2b5c06442539bacae05e49eafb1",
+    "status": "current",
+    "text": "A USB device supplying current upstream can back-power the Raspberry Pi. The documentation discourages this because power delivered through the hub bypasses the board protection circuitry.",
+    "title": "USB back-powering",
+    "url": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/power-supplies.adoc",
+    "version": "9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f"
+  },
+  {
+    "models": [
+      "fixture-controller"
+    ],
+    "revision": "A",
+    "status": "current",
+    "owner_id": null,
+    "version": "fictional-v1",
+    "license": "CC0-1.0",
+    "attribution": "Synthetic evaluation fixture by the project assistant",
+    "url": "https://example.invalid/fixture",
+    "section": "Synthetic test only",
+    "sha256": "synthetic",
+    "keywords": "",
+    "id": "FIXTURE-A",
+    "title": "E14 diagnostic review",
+    "text": "E14 fan failure: replace the fan.",
+    "uploaded_at": "2026-09-08"
+  },
+  {
+    "models": [
+      "fixture-controller"
+    ],
+    "revision": "B",
+    "status": "current",
+    "owner_id": null,
+    "version": "fictional-v1",
+    "license": "CC0-1.0",
+    "attribution": "Synthetic evaluation fixture by the project assistant",
+    "url": "https://example.invalid/fixture",
+    "section": "Synthetic test only",
+    "sha256": "synthetic",
+    "keywords": "",
+    "id": "FIXTURE-B",
+    "title": "E14 diagnostic review",
+    "text": "E14 clock synchronization warning: request diagnostic review.",
+    "uploaded_at": "2026-08-01"
+  },
+  {
+    "models": [
+      "fixture-controller"
+    ],
+    "revision": null,
+    "status": "current",
+    "owner_id": "alice",
+    "version": "fictional-v1",
+    "license": "CC0-1.0",
+    "attribution": "Synthetic evaluation fixture by the project assistant",
+    "url": "https://example.invalid/fixture",
+    "section": "Synthetic test only",
+    "sha256": "synthetic",
+    "keywords": "",
+    "id": "FIXTURE-PRIVATE",
+    "title": "Internal caliper calibration recipe",
+    "text": "Caliper calibration recipe for Alice's test workspace."
+  },
+  {
+    "models": [
+      "fixture-controller"
+    ],
+    "revision": null,
+    "status": "revoked",
+    "owner_id": null,
+    "version": "fictional-v1",
+    "license": "CC0-1.0",
+    "attribution": "Synthetic evaluation fixture by the project assistant",
+    "url": "https://example.invalid/fixture",
+    "section": "Synthetic test only",
+    "sha256": "synthetic",
+    "keywords": "",
+    "id": "FIXTURE-REVOKED",
+    "title": "Tachometer diagnostic Z73",
+    "text": "Tachometer diagnostic Z73. This fictional guidance was revoked."
+  }
+]

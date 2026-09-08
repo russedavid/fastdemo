@@ -18,9 +18,10 @@ def timestamp():
 
 
 class ReportWorkflow:
-    def __init__(self, settings, budget, provider, workspaces, items, reports, jobs):
+    def __init__(self, settings, budget, provider, workspaces, items, reports, jobs, references=None):
         self.settings, self.budget, self.provider = settings, budget, provider
         self.workspaces, self.items, self.reports, self.jobs = workspaces, items, reports, jobs
+        self.references = references
         self.tasks = {}
         self.lock = asyncio.Lock()
         for job in self.jobs(where="status IN ('queued','running')"):
@@ -84,6 +85,7 @@ class ReportWorkflow:
             "evidence_json": json.dumps(result), "sources_json": json.dumps(sources),
             "model_id": metadata.get("model", ""), "generation_usage": json.dumps(metadata.get("usage", {})),
             "review_notes": "",
+            "retrieval_json": json.dumps(metadata.get("retrieval", {})),
         })
         return report_id
 
@@ -117,10 +119,14 @@ class ReportWorkflow:
                 sources = [await self.prepare_source(dict(record), job.user_id) for record in source_records]
                 if sum(len(source["text"]) for source in sources) > self.settings.max_source_chars:
                     raise ValueError("The transcribed inputs exceed the demo's 9,000-character report limit. Shorten the text and try again.")
-                self.jobs.update({"sources_json": json.dumps(sources)}, job_id)
+                retrieval = {"status": "disabled"}
+                if self.references is not None:
+                    sources, retrieval = self.references.enrich(sources, job.user_id, self.settings.max_source_chars)
+                self.jobs.update({"sources_json": json.dumps(sources), "retrieval_json": json.dumps(retrieval)}, job_id)
                 items = [{"transcription": json.dumps({k: v for k, v in source.items() if k != "text"})
                           + "\n" + source["text"]} for source in sources]
                 result, metadata = await self.provider.generate(items, job.user_id)
+                metadata["retrieval"] = retrieval
                 workspace = self.get_workspace(job.workspace_id, job.user_id)
                 report_id = self.save_report(workspace, sources, result, metadata)
                 self.jobs.update({"status": "done", "report_id": report_id, "updated_at": timestamp()}, job_id)

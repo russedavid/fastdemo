@@ -18,6 +18,7 @@ from hosting_runtime import DemoSettings, Budget, LimitReached, RequestLimits
 from groq_service import GroqService, ProviderUnavailable
 from report_workflow import ReportWorkflow
 from report_views import evidence_report_view, evidence_report_editor
+from retrieval import ReferenceIndex, load_references
 
 
 settings = DemoSettings()
@@ -33,7 +34,8 @@ report_annotations = db.create(ReportAnnotation, pk="id", transform=True)
 generations = db.create(Generation, pk="id", transform=True)
 budget = Budget(data_dir / "usage.sqlite3")
 groq = GroqService(budget)
-workflow = ReportWorkflow(settings, budget, groq, workspaces, input_items, maintenance_reports, generations)
+references = ReferenceIndex(data_dir / "references.sqlite3", load_references())
+workflow = ReportWorkflow(settings, budget, groq, workspaces, input_items, maintenance_reports, generations, references)
 
 
 # SPA Components
@@ -420,6 +422,7 @@ def create_default_content(user=None):
             P("This is a personal demo. Use synthetic or non-sensitive inputs. Your private demo workspace expires after 24 hours.", cls=TextPresets.muted_sm),
             Button("Explore the sample report", hx_get=f"/content/view-report/{samples[0].id}", hx_target="#main-content", cls=ButtonT.primary) if samples else None,
             Button("Open sample workspace", hx_get=f"/content/workspace/{samples[0].workspace_id}", hx_target="#main-content", cls=ButtonT.secondary) if samples else None,
+            Button("Try an example with manufacturer references", hx_post="/demo/reference-example", hx_target="#main-content", cls=ButtonT.secondary),
             cls="p-8 space-y-5",
         )
     return Div(
@@ -933,6 +936,7 @@ def content_workspace(session, workspace_id: str = None):
             Subtitle("Add content to your workspace through recording or file upload"),
             cls=SectionT.default
         ),
+        P("Manufacturer references are added when the written notes identify a supported model. This demo's library covers Raspberry Pi 3 Model B+, 4, and 5.", cls=TextPresets.muted_sm),
         
         # Audio Recording Card
         Card(
@@ -3105,6 +3109,36 @@ async def describe_image(item_id: str, session):
         return build_input_item_fragment(input_items[item_id])
     except (LimitReached, ProviderUnavailable) as error:
         return Div(build_input_item_fragment(item), P(str(error), role="alert"))
+
+
+@rt("/demo/reference-example", methods=["POST"])
+def reference_example(session):
+    user_id = session["auth"]
+    if len(workspaces(where="user_id=?", where_args=[user_id])) >= 10:
+        return Alert("This demo allows ten workspaces. Delete an unused workspace first.", cls=AlertT.error)
+    if len(input_items(where="user_id=?", where_args=[user_id])) >= 20:
+        return Alert("This demo allows 20 input files. Delete an unused input first.", cls=AlertT.error)
+    now = get_current_timestamp()
+    workspace_id, item_id = generate_uuid(), generate_uuid()
+    text = ("Gateway GW-19 uses a Raspberry Pi 5 with its fan-control defaults unchanged. "
+            "During warm-up from a cold start, the reported temperature rose from 35 to 45 degrees Celsius; "
+            "the fan remained off. No repair or parts use was recorded.")
+    size = len(text.encode())
+    if sum(item.file_size for item in input_items(where="user_id=?", where_args=[user_id])) + size > 12 * 1024 * 1024:
+        return Alert("This workspace's storage allowance is full. Delete an unused input first.", cls=AlertT.error)
+    if sum(item.file_size for item in input_items()) + size > 300 * 1024 * 1024:
+        return Alert("The demo's storage allowance is full. Please try again later.", cls=AlertT.error)
+    filename = item_id + ".txt"
+    path = upload_dir / "text" / filename
+    path.write_text(text)
+    input_items.insert({"id": item_id, "user_id": user_id, "filename": filename,
+                        "original_filename": "Synthetic gateway observation.txt", "file_path": str(path),
+                        "file_type": "text", "mime_type": "text/plain", "file_size": path.stat().st_size,
+                        "uploaded_at": now, "processed": True, "transcription": text,
+                        "extracted_data": "", "text_origin": "synthetic"})
+    workspaces.insert({"id": workspace_id, "user_id": user_id, "name": "Gateway GW-19 — manufacturer references",
+                       "created_at": now, "updated_at": now, "status": "draft", "input_item_ids": json.dumps([item_id])})
+    return content_workspace(session, workspace_id)
 
 
 @rt("/healthz")

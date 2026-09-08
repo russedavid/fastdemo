@@ -1,0 +1,20 @@
+{"id":"RT-01","query":"Fan remains off while temperature rises from a cold start","model":"raspberry-pi-5","expected_ids":["RP-PI5-FAN"]}
+{"id":"RT-02","query":"Fan is still running as temperature falls to 47 degrees after warming","model":"raspberry-pi-5","expected_ids":["RP-PI5-FAN","RP-PI5-HYST"]}
+{"id":"RT-03","query":"Arm clock slows at 82 degrees; GPU clock not measured","model":"raspberry-pi-4","expected_ids":["RP-THERMAL"]}
+{"id":"RT-04","query":"CPU hits its soft temperature limit and changes from 1.4 to 1.2 GHz","model":"raspberry-pi-3bplus","expected_ids":["RP-PI3-SOFT"]}
+{"id":"RT-05","query":"Which USB-C power supply and current rating are documented?","model":"raspberry-pi-4","expected_ids":["RP-PI4-POWER"]}
+{"id":"RT-06","query":"USB disks share a 600mA budget with a 3A power supply","model":"raspberry-pi-5","expected_ids":["RP-PI5-USB"]}
+{"id":"RT-07","query":"Low voltage warning appeared in the kernel log","model":"raspberry-pi-5","expected_ids":["RP-LOW-VOLTAGE"]}
+{"id":"RT-08","query":"A powered USB hub supplies current upstream into the board","model":"raspberry-pi-4","expected_ids":["RP-BACKPOWER"]}
+{"id":"RT-09","query":"How can the SoC temperature be measured with vcgencmd?","model":"raspberry-pi-5","expected_ids":["RP-TEMPERATURE"]}
+{"id":"RT-10","query":"Fan remains off below a temperature of 50 degrees","model":"raspberry-pi-4","expected_ids":[],"note":"The Pi 5 fan thresholds must not be transferred to a Pi 4. The corpus has no Pi 4 fan-threshold passage."}
+{"id":"RT-11","query":"Alarm E99 is flashing","model":"raspberry-pi-5","expected_ids":[]}
+{"id":"RT-12","query":"Hydraulic fluid drips at an outlet joint","model":"raspberry-pi-4","expected_ids":[]}
+{"id":"RT-13","query":"Fan temperature threshold","model":null,"expected_ids":[],"note":"The model is unknown."}
+{"id":"RT-14","query":"E14 diagnostic review clock warning","model":"fixture-controller","revision":"B","expected_ids":["FIXTURE-B"]}
+{"id":"RT-15","query":"E14 diagnostic review","model":"fixture-controller","expected_ids":[],"note":"Revision-specific guidance requires an established revision."}
+{"id":"RT-16","query":"caliper calibration recipe","model":"fixture-controller","actor":"bob","expected_ids":[],"note":"Only Alice owns the matching current passage."}
+{"id":"RT-17","query":"caliper calibration recipe","model":"fixture-controller","actor":"alice","expected_ids":["FIXTURE-PRIVATE"]}
+{"id":"RT-18","query":"tachometer diagnostic Z73","model":"fixture-controller","expected_ids":[],"note":"The matching passage was revoked."}
+{"id":"RT-19","query":"soft limit changes 1.4 GHz to 1.2 GHz","model":"raspberry-pi-4","expected_ids":[],"note":"The documented soft limit is for a different hardware model."}
+{"id":"RT-20","query":"Brownout warning after USB peripheral demand increased","model":"raspberry-pi-5","expected_ids":["RP-LOW-VOLTAGE"]}

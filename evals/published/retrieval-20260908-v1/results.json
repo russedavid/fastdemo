@@ -1,0 +1,1221 @@
+{
+  "metrics": {
+    "bm25": {
+      "answerable_cases": 12,
+      "unavailable_cases": 8,
+      "macro_recall_at_2": 1.0,
+      "macro_precision_at_2_answerable": 0.6666666666666666,
+      "top_1_relevant_cases": 12,
+      "correct_abstentions": 7,
+      "wrong_applicability_passages": 0,
+      "access_or_revocation_violations": 0,
+      "median_query_ms": 0.1547
+    },
+    "bm25_without_applicability": {
+      "answerable_cases": 12,
+      "unavailable_cases": 8,
+      "macro_recall_at_2": 1.0,
+      "macro_precision_at_2_answerable": 0.5833333333333334,
+      "top_1_relevant_cases": 12,
+      "correct_abstentions": 3,
+      "wrong_applicability_passages": 14,
+      "access_or_revocation_violations": 0,
+      "median_query_ms": 0.1526
+    },
+    "overlap": {
+      "answerable_cases": 12,
+      "unavailable_cases": 8,
+      "macro_recall_at_2": 1.0,
+      "macro_precision_at_2_answerable": 0.6666666666666666,
+      "top_1_relevant_cases": 11,
+      "correct_abstentions": 7,
+      "wrong_applicability_passages": 0,
+      "access_or_revocation_violations": 0,
+      "median_query_ms": 0.1648
+    }
+  },
+  "cases": [
+    {
+      "case_id": "RT-01",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-PI5-FAN",
+        "RP-PI5-HYST"
+      ],
+      "scores": [
+        -4,
+        -3
+      ],
+      "expected_ids": [
+        "RP-PI5-FAN"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.3038
+    },
+    {
+      "case_id": "RT-02",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-PI5-HYST",
+        "RP-PI5-FAN"
+      ],
+      "scores": [
+        -4,
+        -3
+      ],
+      "expected_ids": [
+        "RP-PI5-FAN",
+        "RP-PI5-HYST"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 1.0,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.2038
+    },
+    {
+      "case_id": "RT-03",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-THERMAL",
+        "RP-TEMPERATURE"
+      ],
+      "scores": [
+        -3,
+        -1
+      ],
+      "expected_ids": [
+        "RP-THERMAL"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1781
+    },
+    {
+      "case_id": "RT-04",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-PI3-SOFT",
+        "RP-THERMAL"
+      ],
+      "scores": [
+        -5,
+        -2
+      ],
+      "expected_ids": [
+        "RP-PI3-SOFT"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1711
+    },
+    {
+      "case_id": "RT-05",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-LOW-VOLTAGE",
+        "RP-PI4-POWER"
+      ],
+      "scores": [
+        -5,
+        -4
+      ],
+      "expected_ids": [
+        "RP-PI4-POWER"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": false,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1738
+    },
+    {
+      "case_id": "RT-06",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-PI5-USB",
+        "RP-LOW-VOLTAGE"
+      ],
+      "scores": [
+        -7,
+        -3
+      ],
+      "expected_ids": [
+        "RP-PI5-USB"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1931
+    },
+    {
+      "case_id": "RT-07",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-LOW-VOLTAGE"
+      ],
+      "scores": [
+        -5
+      ],
+      "expected_ids": [
+        "RP-LOW-VOLTAGE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 1.0,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1864
+    },
+    {
+      "case_id": "RT-08",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-BACKPOWER",
+        "RP-PI4-POWER"
+      ],
+      "scores": [
+        -6,
+        -2
+      ],
+      "expected_ids": [
+        "RP-BACKPOWER"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1648
+    },
+    {
+      "case_id": "RT-09",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-TEMPERATURE",
+        "RP-PI5-FAN"
+      ],
+      "scores": [
+        -4,
+        -2
+      ],
+      "expected_ids": [
+        "RP-TEMPERATURE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1944
+    },
+    {
+      "case_id": "RT-10",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-TEMPERATURE",
+        "RP-THERMAL"
+      ],
+      "scores": [
+        -1,
+        -1
+      ],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": 0.0,
+      "top_1_relevant": null,
+      "correct_abstention": false,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1435
+    },
+    {
+      "case_id": "RT-11",
+      "method": "overlap",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1591
+    },
+    {
+      "case_id": "RT-12",
+      "method": "overlap",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1312
+    },
+    {
+      "case_id": "RT-13",
+      "method": "overlap",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.0006
+    },
+    {
+      "case_id": "RT-14",
+      "method": "overlap",
+      "returned_ids": [
+        "FIXTURE-B"
+      ],
+      "scores": [
+        -5
+      ],
+      "expected_ids": [
+        "FIXTURE-B"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 1.0,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.0924
+    },
+    {
+      "case_id": "RT-15",
+      "method": "overlap",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.078
+    },
+    {
+      "case_id": "RT-16",
+      "method": "overlap",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.078
+    },
+    {
+      "case_id": "RT-17",
+      "method": "overlap",
+      "returned_ids": [
+        "FIXTURE-PRIVATE"
+      ],
+      "scores": [
+        -3
+      ],
+      "expected_ids": [
+        "FIXTURE-PRIVATE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 1.0,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.0892
+    },
+    {
+      "case_id": "RT-18",
+      "method": "overlap",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.0772
+    },
+    {
+      "case_id": "RT-19",
+      "method": "overlap",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1289
+    },
+    {
+      "case_id": "RT-20",
+      "method": "overlap",
+      "returned_ids": [
+        "RP-LOW-VOLTAGE",
+        "RP-PI5-USB"
+      ],
+      "scores": [
+        -5,
+        -2
+      ],
+      "expected_ids": [
+        "RP-LOW-VOLTAGE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1648
+    },
+    {
+      "case_id": "RT-01",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-PI5-FAN",
+        "RP-PI5-HYST"
+      ],
+      "scores": [
+        -6.426868620219703,
+        -3.6814608837948684
+      ],
+      "expected_ids": [
+        "RP-PI5-FAN"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.2108
+    },
+    {
+      "case_id": "RT-02",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-PI5-HYST",
+        "RP-PI5-FAN"
+      ],
+      "scores": [
+        -7.70914611659958,
+        -4.25766398219483
+      ],
+      "expected_ids": [
+        "RP-PI5-FAN",
+        "RP-PI5-HYST"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 1.0,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1661
+    },
+    {
+      "case_id": "RT-03",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-THERMAL",
+        "RP-TEMPERATURE"
+      ],
+      "scores": [
+        -7.1671984647558045,
+        -5.375549818807309
+      ],
+      "expected_ids": [
+        "RP-THERMAL"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1547
+    },
+    {
+      "case_id": "RT-04",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-PI3-SOFT",
+        "RP-THERMAL"
+      ],
+      "scores": [
+        -9.382803799647794,
+        -1.7827066685507083
+      ],
+      "expected_ids": [
+        "RP-PI3-SOFT"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1589
+    },
+    {
+      "case_id": "RT-05",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-PI4-POWER",
+        "RP-BACKPOWER"
+      ],
+      "scores": [
+        -5.066125833665178,
+        -4.714118521165103
+      ],
+      "expected_ids": [
+        "RP-PI4-POWER"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1634
+    },
+    {
+      "case_id": "RT-06",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-PI5-USB",
+        "RP-BACKPOWER"
+      ],
+      "scores": [
+        -12.393026320585557,
+        -3.294698547842233
+      ],
+      "expected_ids": [
+        "RP-PI5-USB"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1616
+    },
+    {
+      "case_id": "RT-07",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-LOW-VOLTAGE"
+      ],
+      "scores": [
+        -13.087901983482235
+      ],
+      "expected_ids": [
+        "RP-LOW-VOLTAGE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 1.0,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.155
+    },
+    {
+      "case_id": "RT-08",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-BACKPOWER",
+        "RP-PI4-POWER"
+      ],
+      "scores": [
+        -11.644567661472713,
+        -4.364311260946825
+      ],
+      "expected_ids": [
+        "RP-BACKPOWER"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1681
+    },
+    {
+      "case_id": "RT-09",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-TEMPERATURE",
+        "RP-PI5-FAN"
+      ],
+      "scores": [
+        -10.986999634038403,
+        -0.9895845280552291
+      ],
+      "expected_ids": [
+        "RP-TEMPERATURE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1594
+    },
+    {
+      "case_id": "RT-10",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-TEMPERATURE",
+        "RP-THERMAL"
+      ],
+      "scores": [
+        -0.7676232475070509,
+        -0.3956635910825358
+      ],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": 0.0,
+      "top_1_relevant": null,
+      "correct_abstention": false,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1481
+    },
+    {
+      "case_id": "RT-11",
+      "method": "bm25",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1144
+    },
+    {
+      "case_id": "RT-12",
+      "method": "bm25",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1155
+    },
+    {
+      "case_id": "RT-13",
+      "method": "bm25",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.0005
+    },
+    {
+      "case_id": "RT-14",
+      "method": "bm25",
+      "returned_ids": [
+        "FIXTURE-B"
+      ],
+      "scores": [
+        -11.393994905344519
+      ],
+      "expected_ids": [
+        "FIXTURE-B"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 1.0,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1445
+    },
+    {
+      "case_id": "RT-15",
+      "method": "bm25",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1226
+    },
+    {
+      "case_id": "RT-16",
+      "method": "bm25",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1212
+    },
+    {
+      "case_id": "RT-17",
+      "method": "bm25",
+      "returned_ids": [
+        "FIXTURE-PRIVATE"
+      ],
+      "scores": [
+        -11.62047154276928
+      ],
+      "expected_ids": [
+        "FIXTURE-PRIVATE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 1.0,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1384
+    },
+    {
+      "case_id": "RT-18",
+      "method": "bm25",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1263
+    },
+    {
+      "case_id": "RT-19",
+      "method": "bm25",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.13
+    },
+    {
+      "case_id": "RT-20",
+      "method": "bm25",
+      "returned_ids": [
+        "RP-LOW-VOLTAGE",
+        "RP-PI5-USB"
+      ],
+      "scores": [
+        -7.585477296002225,
+        -3.2748649988851373
+      ],
+      "expected_ids": [
+        "RP-LOW-VOLTAGE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1584
+    },
+    {
+      "case_id": "RT-01",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-PI5-FAN",
+        "RP-PI5-HYST"
+      ],
+      "scores": [
+        -6.426868620219703,
+        -3.6814608837948684
+      ],
+      "expected_ids": [
+        "RP-PI5-FAN"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.174
+    },
+    {
+      "case_id": "RT-02",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-PI5-HYST",
+        "RP-PI5-FAN"
+      ],
+      "scores": [
+        -7.70914611659958,
+        -4.25766398219483
+      ],
+      "expected_ids": [
+        "RP-PI5-FAN",
+        "RP-PI5-HYST"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 1.0,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1631
+    },
+    {
+      "case_id": "RT-03",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-THERMAL",
+        "RP-TEMPERATURE"
+      ],
+      "scores": [
+        -7.1671984647558045,
+        -5.375549818807309
+      ],
+      "expected_ids": [
+        "RP-THERMAL"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1618
+    },
+    {
+      "case_id": "RT-04",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-PI3-SOFT",
+        "RP-PI5-FAN"
+      ],
+      "scores": [
+        -9.382803799647794,
+        -2.1386000608666134
+      ],
+      "expected_ids": [
+        "RP-PI3-SOFT"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [
+        "RP-PI5-FAN"
+      ],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1648
+    },
+    {
+      "case_id": "RT-05",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-PI4-POWER",
+        "RP-BACKPOWER"
+      ],
+      "scores": [
+        -5.066125833665178,
+        -4.714118521165103
+      ],
+      "expected_ids": [
+        "RP-PI4-POWER"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.172
+    },
+    {
+      "case_id": "RT-06",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-PI5-USB",
+        "RP-PI4-POWER"
+      ],
+      "scores": [
+        -12.393026320585557,
+        -5.095831685463813
+      ],
+      "expected_ids": [
+        "RP-PI5-USB"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [
+        "RP-PI4-POWER"
+      ],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.2978
+    },
+    {
+      "case_id": "RT-07",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-LOW-VOLTAGE",
+        "FIXTURE-B"
+      ],
+      "scores": [
+        -13.087901983482235,
+        -2.1513321201547164
+      ],
+      "expected_ids": [
+        "RP-LOW-VOLTAGE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [
+        "FIXTURE-B"
+      ],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1502
+    },
+    {
+      "case_id": "RT-08",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-BACKPOWER",
+        "RP-PI4-POWER"
+      ],
+      "scores": [
+        -11.644567661472713,
+        -4.364311260946825
+      ],
+      "expected_ids": [
+        "RP-BACKPOWER"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1576
+    },
+    {
+      "case_id": "RT-09",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-TEMPERATURE",
+        "RP-PI5-FAN"
+      ],
+      "scores": [
+        -10.986999634038403,
+        -0.9895845280552291
+      ],
+      "expected_ids": [
+        "RP-TEMPERATURE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1538
+    },
+    {
+      "case_id": "RT-10",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-PI5-FAN",
+        "RP-PI5-HYST"
+      ],
+      "scores": [
+        -5.929615227754402,
+        -5.130920899749109
+      ],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": 0.0,
+      "top_1_relevant": null,
+      "correct_abstention": false,
+      "wrong_applicability": [
+        "RP-PI5-FAN",
+        "RP-PI5-HYST"
+      ],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.15
+    },
+    {
+      "case_id": "RT-11",
+      "method": "bm25_without_applicability",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.122
+    },
+    {
+      "case_id": "RT-12",
+      "method": "bm25_without_applicability",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1204
+    },
+    {
+      "case_id": "RT-13",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-PI5-HYST",
+        "RP-PI5-FAN"
+      ],
+      "scores": [
+        -3.9118912993365402,
+        -3.648210752047529
+      ],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": 0.0,
+      "top_1_relevant": null,
+      "correct_abstention": false,
+      "wrong_applicability": [
+        "RP-PI5-HYST",
+        "RP-PI5-FAN"
+      ],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1607
+    },
+    {
+      "case_id": "RT-14",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "FIXTURE-B",
+        "FIXTURE-A"
+      ],
+      "scores": [
+        -11.393994905344519,
+        -7.406098511750094
+      ],
+      "expected_ids": [
+        "FIXTURE-B"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [
+        "FIXTURE-A"
+      ],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1516
+    },
+    {
+      "case_id": "RT-15",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "FIXTURE-B",
+        "FIXTURE-A"
+      ],
+      "scores": [
+        -7.693912651400222,
+        -7.406098511750094
+      ],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": 0.0,
+      "top_1_relevant": null,
+      "correct_abstention": false,
+      "wrong_applicability": [
+        "FIXTURE-B",
+        "FIXTURE-A"
+      ],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1359
+    },
+    {
+      "case_id": "RT-16",
+      "method": "bm25_without_applicability",
+      "returned_ids": [],
+      "scores": [],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": null,
+      "top_1_relevant": null,
+      "correct_abstention": true,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1208
+    },
+    {
+      "case_id": "RT-17",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "FIXTURE-PRIVATE"
+      ],
+      "scores": [
+        -11.62047154276928
+      ],
+      "expected_ids": [
+        "FIXTURE-PRIVATE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 1.0,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1321
+    },
+    {
+      "case_id": "RT-18",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "FIXTURE-B",
+        "FIXTURE-A"
+      ],
+      "scores": [
+        -2.036421877925237,
+        -1.9072218255647786
+      ],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": 0.0,
+      "top_1_relevant": null,
+      "correct_abstention": false,
+      "wrong_applicability": [
+        "FIXTURE-B",
+        "FIXTURE-A"
+      ],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.136
+    },
+    {
+      "case_id": "RT-19",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-PI3-SOFT",
+        "RP-PI5-FAN"
+      ],
+      "scores": [
+        -7.7082613559304995,
+        -1.7743106752443667
+      ],
+      "expected_ids": [],
+      "recall_at_2": null,
+      "precision_at_2": 0.0,
+      "top_1_relevant": null,
+      "correct_abstention": false,
+      "wrong_applicability": [
+        "RP-PI3-SOFT",
+        "RP-PI5-FAN"
+      ],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1407
+    },
+    {
+      "case_id": "RT-20",
+      "method": "bm25_without_applicability",
+      "returned_ids": [
+        "RP-LOW-VOLTAGE",
+        "RP-PI5-USB"
+      ],
+      "scores": [
+        -7.585477296002225,
+        -3.2748649988851373
+      ],
+      "expected_ids": [
+        "RP-LOW-VOLTAGE"
+      ],
+      "recall_at_2": 1.0,
+      "precision_at_2": 0.5,
+      "top_1_relevant": true,
+      "correct_abstention": null,
+      "wrong_applicability": [],
+      "access_or_revocation_violation": [],
+      "elapsed_ms": 0.1526
+    }
+  ]
+}

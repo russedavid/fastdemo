@@ -1,0 +1,68 @@
+"""Four frozen retrieval-plus-generation development traces; no media claims."""
+
+import argparse
+import asyncio
+import json
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+from evals.pilot import call_requests, save, sha
+from evals.run_reports import source_items
+from groq_service import MODEL, report_request
+from retrieval import ReferenceIndex, load_references
+
+ROOT = Path(__file__).resolve().parents[1]
+CASES = [
+    ("RG-001", ["Gateway GW-19 uses a Raspberry Pi 5 with its fan-control defaults unchanged. During warm-up from a cold start, the reported temperature rose from 35 to 45 degrees Celsius; the fan remained off. No repair or parts use was recorded."]),
+    ("RG-002", ["Gateway GW-18 uses a Raspberry Pi 4 Model B with default thermal settings. During this observation the SoC temperature rose to 82 degrees Celsius and the Arm clock decreased. The GPU clock was not measured. No maintenance or parts use was recorded."]),
+    ("RG-003", ["Gateway GW-40 uses a Raspberry Pi 4. During this observation its fan stayed off at a temperature of 45 degrees Celsius. The fan configuration was not recorded. No repair was attempted and no parts were fitted."]),
+    ("RG-004", ["Technician A reports that gateway GW-42 uses a Raspberry Pi 4 and that its fan is off. No work or parts use was recorded.",
+                "Technician B reports that the same GW-42 uses a Raspberry Pi 5. Neither hardware identification has been confirmed or withdrawn."]),
+]
+
+
+async def execute(args):
+    if args.interval < 65:
+        raise ValueError("Keep at least 65 seconds between free-tier requests")
+    output = args.output or ROOT / "evals/runs" / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-rag")
+    output.mkdir(parents=True, exist_ok=False)
+    prepared = []
+    with tempfile.TemporaryDirectory() as directory:
+        index = ReferenceIndex(Path(directory) / "references.sqlite3", load_references())
+        for case_id, texts in CASES:
+            sources = [{"id": f"{case_id}-N{i}", "type": "field_note", "origin": "synthetic", "text": text}
+                       for i, text in enumerate(texts, 1)]
+            augmented, trace = index.enrich(sources, "evaluation")
+            items = source_items({"sources": augmented})
+            request = report_request(items)
+            prepared.append({"trace_id": case_id + "-current", "case_id": case_id, "variant": "current",
+                             "input_sources": augmented, "original_sources": sources, "retrieval": trace,
+                             "source_items": items, "request": request, "request_sha256": sha(request), "source_sha256": sha(augmented)})
+    manifest = {"name": "frontline-rag-development-v1", "started_at": datetime.now(timezone.utc).isoformat(),
+                "scope": "Retrieval plus report generation from supplied synthetic texts; compact source IDs; no live audio/image or production accuracy claim.",
+                "method": "Four frozen requests after deterministic retrieval, including unavailable and ambiguous context.",
+                "provider": "groq", "model": MODEL, "planned_requests": len(prepared), "attempted": 0, "completed": [],
+                "interval_seconds": args.interval, "selected_variant": "current", "continue_schema_errors": True,
+                "label_status": "No human labels; assistant review follows generation", "artifacts": {},
+                "status": "prepared" if args.prepare else "running"}
+    for name in ("reporting.py", "report-instructions.txt", "groq_service.py", "retrieval.py", "report_views.py",
+                 "evals/pilot.py", "evals/check_rag.py", "reference-data/passages-v1.jsonl", "reference-data/manifest.json"):
+        contents = (ROOT / name).read_bytes()
+        manifest["artifacts"][name] = sha(contents)
+        (output / (name.replace("/", "__") + ".snapshot")).write_bytes(contents)
+    save(output / "manifest.json", manifest)
+    save(output / "prepared-requests.json", prepared)
+    save(output / "review-order.json", [r["trace_id"] for r in prepared])
+    print("Prepared four RAG cases in " + str(output), flush=True)
+    if not args.prepare:
+        await call_requests(args, output, prepared, manifest)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--credentials", type=Path)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--interval", type=int, default=65)
+    parser.add_argument("--prepare", action="store_true")
+    asyncio.run(execute(parser.parse_args()))

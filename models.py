@@ -53,6 +53,7 @@ class MaintenanceReport:
     model_id: str = ""
     generation_usage: str = ""
     review_notes: str = ""
+    retrieval_json: str = "{}"
 
 class Generation:
     id: str
@@ -64,6 +65,7 @@ class Generation:
     report_id: str = ""
     error: str = ""
     sources_json: str = ""
+    retrieval_json: str = "{}"
 
 class ReportAnnotation:
     id: str  # UUID

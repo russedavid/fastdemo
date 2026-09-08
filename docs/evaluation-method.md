@@ -8,6 +8,8 @@ The current work is an evaluation foundation, not a claim that a semantic judge 
 Current review decision
 -----------------------
 
+Progress: the initial assistant review led to revised report instructions and a [20-output follow-up](../evals/assessments/20260908T220823Z-pilot-assistant/report.md), with 18 provisional passes versus 12 for the earlier deployed instructions. A [separate retrieval study](reference-retrieval.md) and four retrieval-plus-generation traces now complement the report-component assessment. All remain development evidence; the two remaining report failures are retained.
+
 The owner subsequently delegated all 40 pilot reviews to the assistant because they did not have time to review them personally. Proceed with provisional assistant judgments for engineering decisions. This supersedes the earlier requirement to wait for owner labels before grouping failures or improving the application. It does not turn assistant judgments into human labels or establish human alignment.
 
 The [completed assistant assessment](../evals/assessments/20260908T160338Z-pilot-assistant/report.md) records every verdict, source evidence, uncertainty about boundary decisions, the original open notes, and a consistency pass. The assistant first read outputs without variant names or provisional reference answers, then grouped failures. Prior development/corpus exposure is disclosed. The resulting 21 Pass / 19 Fail judgments include four section-only failures; that sensitivity is reported separately. No new model calls were required. This adapts the authors' trace-review and error-analysis process while explicitly omitting independent human review for now.

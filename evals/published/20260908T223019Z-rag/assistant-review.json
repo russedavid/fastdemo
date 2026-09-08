@@ -1,0 +1,77 @@
+{
+  "scope": "Four synthetic development traces, reviewed by the assistant; no human validation or production-accuracy claim.",
+  "events": [
+    {
+      "trace_id": "RG-001-current",
+      "run_id": "20260908T223019Z-rag",
+      "reviewer": "codex-interactive-review",
+      "reviewer_kind": "assistant",
+      "criteria_version": "assistant-v1",
+      "criterion": "overall_task_success",
+      "verdict": "pass",
+      "critique": "The field observation and manufacturer fan thresholds stay distinct. Parts use remains unknown; no fan defect or repair is invented. The extra hysteresis passage is unnecessary to this warm-up observation but is accurately attributed.",
+      "source_evidence": {
+        "source_id": "RG-001-N1",
+        "quote": "No repair or parts use was recorded."
+      },
+      "source_sha256": "a18574b693a43a82ecbff0a0fb757cc0898153d5b24af0bd4fec596bdfd2f0f2",
+      "output_sha256": "863746a8a512f987a6c6358b657c109f8b4cbe48dab908607c497172194d63b6",
+      "created_at": "2026-09-08T22:40:47.342499+00:00",
+      "human_calibration_eligible": false
+    },
+    {
+      "trace_id": "RG-002-current",
+      "run_id": "20260908T223019Z-rag",
+      "reviewer": "codex-interactive-review",
+      "reviewer_kind": "assistant",
+      "criteria_version": "assistant-v1",
+      "criterion": "overall_task_success",
+      "verdict": "pass",
+      "critique": "The observed 82 C temperature, Arm-clock reduction, and unmeasured GPU are preserved. Retrieved thermal and temperature-reading guidance is attributed as reference material; no new measurement or repair is claimed.",
+      "source_evidence": {
+        "source_id": "RG-002-N1",
+        "quote": "The GPU clock was not measured."
+      },
+      "source_sha256": "cb9d0c0dab294fc9f581d1352d8f94453e35a16d7cd8aedd8abfbc42538d4aa0",
+      "output_sha256": "43de4755597946926847259eae5cd78f019a29ff50d74d123c48f638defc6f01",
+      "created_at": "2026-09-08T22:40:47.342769+00:00",
+      "human_calibration_eligible": false
+    },
+    {
+      "trace_id": "RG-003-current",
+      "run_id": "20260908T223019Z-rag",
+      "reviewer": "codex-interactive-review",
+      "reviewer_kind": "assistant",
+      "criteria_version": "assistant-v1",
+      "criterion": "overall_task_success",
+      "verdict": "pass",
+      "critique": "No Pi 5 fan guidance is transferred to a Pi 4. Retrieval abstains, and the report preserves the observation, unknown fan configuration, and explicit no parts use without diagnosing a fan defect.",
+      "source_evidence": {
+        "source_id": "RG-003-N1",
+        "quote": "The fan configuration was not recorded."
+      },
+      "source_sha256": "eb467bd291a735b467a8b497e3153c5966f0d1cf6852b38c1486099888e912a1",
+      "output_sha256": "02f72d4ba9766a1b0e774e5b138f3dbba6b79eec0284788e6602aadd88a73683",
+      "created_at": "2026-09-08T22:40:47.342891+00:00",
+      "human_calibration_eligible": false
+    },
+    {
+      "trace_id": "RG-004-current",
+      "run_id": "20260908T223019Z-rag",
+      "reviewer": "codex-interactive-review",
+      "reviewer_kind": "assistant",
+      "criteria_version": "assistant-v1",
+      "criterion": "overall_task_success",
+      "verdict": "pass",
+      "critique": "Retrieval abstains on competing hardware identifications. The report attributes both accounts, retains unknown parts use, and asks to confirm the model. The shared equipment identifier is still correctly known.",
+      "source_evidence": {
+        "source_id": "RG-004-N2",
+        "quote": "Neither hardware identification has been confirmed or withdrawn."
+      },
+      "source_sha256": "810443ecdf66c90f23ec4912649ae95d8a54794bd805f8ea4ca2a54c287e715b",
+      "output_sha256": "8b755757bc7200bd2ae099bfe5001249ed81950bc261006e5bfa2154e85b14cd",
+      "created_at": "2026-09-08T22:40:47.343003+00:00",
+      "human_calibration_eligible": false
+    }
+  ]
+}

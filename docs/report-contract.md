@@ -30,4 +30,8 @@ Pydantic checks field types and disallows extra properties. Additional checks en
 
 These checks do not prove semantic entailment or entity disambiguation. A wrong claim may cite a real source, and a source may contain several valid identifiers. Review source support separately from structural acceptance. The five included cases are assistant-authored synthetic development fixtures; their labels have not received independent human review.
 
+The current validator also rejects unexpected control characters instead of silently repairing damaged measurement text. Production requests pass explicit source roles: reference-only citations cannot establish completed work, actual parts use, an installed identifier, or an assigned priority/service date. Retrieved guidance remains a distinct source type and is displayed separately when its claims cite only references. Unknown parts use is still a semantic distinction that the instructions and source review must enforce; a valid structure alone does not establish it.
+
+The current development corpus has 20 cases. The initial paired review, subsequent instruction changes, and remaining failures are documented in [the follow-up study](../evals/assessments/20260908T220823Z-pilot-assistant/report.md). No human validation is claimed.
+
 See [evaluation instructions](../evals/README.md) for offline tests, local execution, retained artifacts, and review guidance.
