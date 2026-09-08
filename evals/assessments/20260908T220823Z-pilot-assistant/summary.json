@@ -1,0 +1,111 @@
+{
+  "run": "20260908T220823Z-pilot",
+  "planned_requests": 20,
+  "completed_requests": 20,
+  "status": "finished",
+  "reference_status": "Provisional AI-authored expectations, not human gold labels",
+  "semantic_evaluation": "provisional_assistant_review",
+  "human_reviewed_traces": 0,
+  "assistant_reviewed_traces": 20,
+  "criteria_version": "assistant-v1",
+  "reviewer": "codex-interactive-review",
+  "reviewer_kind": "assistant",
+  "variants": {
+    "deployed": {
+      "traces": 20,
+      "structure": {
+        "accepted": 20
+      },
+      "fields": {
+        "equipment_id": {
+          "pass": 20
+        },
+        "priority": {
+          "pass": 20
+        },
+        "next_service_date": {
+          "pass": 20
+        },
+        "parts_used": {
+          "pass": 20
+        }
+      },
+      "fields_by_expected_state": {
+        "equipment_id": {
+          "known": {
+            "pass": 18
+          },
+          "unknown": {
+            "pass": 2
+          }
+        },
+        "priority": {
+          "unknown": {
+            "pass": 18
+          },
+          "known": {
+            "pass": 1
+          },
+          "conflicting": {
+            "pass": 1
+          }
+        },
+        "next_service_date": {
+          "unknown": {
+            "pass": 19
+          },
+          "known": {
+            "pass": 1
+          }
+        },
+        "parts_used": {
+          "known": {
+            "pass": 5
+          },
+          "none": {
+            "pass": 8
+          },
+          "unknown": {
+            "pass": 6
+          },
+          "conflicting": {
+            "pass": 1
+          }
+        }
+      },
+      "human": {
+        "unreviewed": 20
+      },
+      "assistant": {
+        "pass": 18,
+        "fail": 2
+      },
+      "latencies": [
+        1.3781,
+        1.0737,
+        1.089,
+        2.4378,
+        1.4591,
+        0.9498,
+        1.032,
+        0.9753,
+        2.8818,
+        0.9019,
+        1.1845,
+        1.0965,
+        1.2166,
+        0.8986,
+        1.218,
+        1.1301,
+        0.9223,
+        1.0346,
+        1.215,
+        1.3858
+      ],
+      "tokens_reported": 47170,
+      "traces_with_usage": 20,
+      "traces_missing_usage": 0
+    }
+  },
+  "limitation": "Field checks do not establish prose quality. Assistant judgments are provisional and do not establish human alignment or production accuracy. Reviewer kinds remain separate; no combined quality score is calculated."
+}

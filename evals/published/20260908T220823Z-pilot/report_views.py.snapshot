@@ -38,11 +38,6 @@ def evidence_report_view(record):
     report = json.loads(record.evidence_json)
     sources = json.loads(record.sources_json)
     source_numbers = {source["id"]: i + 1 for i, source in enumerate(sources)}
-    reference_ids = {source["id"] for source in sources if source.get("evidence_role") == "reference"}
-    retrieval = json.loads(getattr(record, "retrieval_json", "{}") or "{}")
-
-    def reference_only(item):
-        return bool(item["source_ids"]) and set(item["source_ids"]) <= reference_ids
 
     def citations(ids):
         return [A(f"[{source_numbers[source_id]}]", href=f"#source-{source_numbers[source_id]}",
@@ -51,7 +46,7 @@ def evidence_report_view(record):
     def claims(title, items, empty):
         return Card(
             CardHeader(H3(title)),
-            CardBody(Ul(*(Li("Clarification: " if item.get("basis") == "clarification" else "Reference recommendation: " if item.get("basis") == "source" and reference_only(item) else "",
+            CardBody(Ul(*(Li("Clarification: " if item.get("basis") == "clarification" else "",
                             item["text"], " ", *citations(item["source_ids"]), cls="mb-3") for item in items))
                      if items else P(empty, cls=TextPresets.muted_sm)),
             body_cls="p-0", cls="mb-4",
@@ -77,22 +72,10 @@ def evidence_report_view(record):
         origin = source.get("origin", "user")
         origin_label = {"user": "Written note", "groq_audio": "AI transcript — review against the recording",
                         "groq_image": "AI image description — review against the image",
-                        "user_edited": "User-edited source text", "synthetic": "Synthetic example note",
-                        "manufacturer_reference_summary": "Retrieved manufacturer guidance — summarized from the cited documentation"}.get(origin, origin)
-        reference_link = None
-        attribution = None
-        if source.get("reference_url", "").startswith("https://"):
-            reference_link = P(A("Read the original documentation", href=source["reference_url"], target="_blank", rel="noopener noreferrer"),
-                               " · ", source.get("section", ""),
-                               Small(" · version " + source.get("reference_version", "")[:12]))
-            license_link = (A("CC BY-SA 4.0", href="https://creativecommons.org/licenses/by-sa/4.0/", target="_blank", rel="noopener noreferrer")
-                            if source.get("license") == "CC-BY-SA-4.0" else source.get("license", ""))
-            attribution = P(source.get("attribution", ""), " · ", license_link, cls=TextPresets.muted_sm)
+                        "user_edited": "User-edited source text", "synthetic": "Synthetic example note"}.get(origin, origin)
         source_cards.append(
             Details(Summary(f"[{i}] {source.get('filename', 'Source')}"),
                     P(origin_label, cls=TextPresets.muted_sm),
-                    reference_link,
-                    attribution,
                     Pre(source["text"], cls="source-text"),
                     id=f"source-{i}", open=True, cls="source-panel")
         )
@@ -103,14 +86,7 @@ def evidence_report_view(record):
                       value("Priority", report["priority"]),
                       value("Next service date", report["next_service_date"])),
              body_cls="p-0", cls="my-4"),
-        P({"retrieved": "Applicable reference passages were retrieved and saved with this report.",
-           "unknown_model": "No supported reference model was recognized in the written notes. This report uses the supplied inputs.",
-           "ambiguous_model": "The written notes contain competing model or revision information. No reference was selected.",
-           "no_match": "No applicable passage matched in the demo's reference library.",
-           "context_budget": "The source packet was full, so reference passages were left out."}.get(retrieval.get("status"), ""),
-          cls=TextPresets.muted_sm) if retrieval.get("status") not in (None, "disabled") else None,
-        claims("Observations", [o for o in report["observations"] if not reference_only(o)], "No observations recorded."),
-        claims("Reference guidance", [o for o in report["observations"] if reference_only(o)], "") if any(reference_only(o) for o in report["observations"]) else None,
+        claims("Observations", report["observations"], "No observations recorded."),
         claims("Completed work", report["completed_work"], "No completed-work entries in this draft. Check the observations and sources."),
         Card(CardHeader(H3("Parts used")), CardBody(parts_body), body_cls="p-0", cls="mb-4"),
         claims("Proposed actions", report["proposed_actions"], "No proposed actions recorded."),

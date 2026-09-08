@@ -156,6 +156,24 @@ class EvaluationIntegrityTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "quote does not occur"):
                 load_assessment(run, target)
 
+    def test_export_describes_single_variant_and_paired_runs_accurately(self):
+        from evals.export_run import export_run
+        for variant in ("both", "deployed"):
+            with self.subTest(variant=variant), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                source, destination = root / "source" / "run", root / "destination" / "run"
+                source.mkdir(parents=True)
+                manifest = {"status": "finished", "planned_requests": 1, "completed": ["trace-a"], "selected_variant": variant}
+                (source / "manifest.json").write_text(json.dumps(manifest))
+                (source / "prepared-requests.json").write_text("[]")
+                (source / "review-order.json").write_text('["trace-a"]')
+                (source / "trace-a.json").write_text('{"structural_status":"rejected"}')
+                self.assertEqual(export_run(source, destination), 1)
+                description = (destination / "README.md").read_text()
+                self.assertEqual("two variants" in description, variant == "both")
+                self.assertEqual("one instruction variant" in description, variant != "both")
+                self.assertTrue((destination / "trace-a.json").exists())
+
 
 @unittest.skipUnless(HAS_APP, "Install application dependencies for request/review checks")
 class PilotRequestTests(unittest.TestCase):

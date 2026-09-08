@@ -129,15 +129,6 @@ def source_texts_from_items(items):
     }
 
 
-def source_roles_from_items(items):
-    roles = {}
-    reference_types = {"reference", "fictional_manual_excerpt", "public_reference_summary"}
-    for item in items:
-        header = json.loads(item["transcription"].partition("\n")[0])
-        roles[header["id"]] = "reference" if header.get("evidence_role") == "reference" or header.get("type") in reference_types else "observation"
-    return roles
-
-
 def response_schema(source_ids):
     schema = Report.model_json_schema()
 
@@ -187,7 +178,7 @@ def build_request(items, model):
     }
 
 
-def parse_report(content, source_texts, source_roles=None):
+def parse_report(content, source_texts):
     if not isinstance(source_texts, dict):
         raise TypeError(
             "Citation validation requires source IDs mapped to their original text"
@@ -195,9 +186,6 @@ def parse_report(content, source_texts, source_roles=None):
     report = Report.model_validate_json(content)
     data = report.model_dump(mode="json")
     allowed = set(source_texts)
-    roles = source_roles if source_roles is not None else dict.fromkeys(allowed, "observation")
-    if set(roles) != allowed or not set(roles.values()) <= {"observation", "reference"}:
-        raise ValueError("Every source needs a recognized evidence role")
 
     def check_ids(node):
         if isinstance(node, dict):
@@ -217,16 +205,6 @@ def parse_report(content, source_texts, source_roles=None):
                 raise ValueError("Report text contains an unexpected control character")
 
     check_ids(data)
-    for claim in report.completed_work:
-        if not any(roles[source_id] == "observation" for source_id in claim.source_ids):
-            raise ValueError("Reference guidance cannot establish completed work")
-    for field in (report.priority, report.next_service_date):
-        if field.state == "known" and not any(roles[source_id] == "observation" for source_id in field.source_ids):
-            raise ValueError("A reference alone cannot assign this visit's priority or service date")
-    if report.parts_used.state in {"known", "none", "conflicting"} and not any(
-        roles[source_id] == "observation" for source_id in report.parts_used.source_ids
-    ):
-        raise ValueError("A reference alone cannot establish actual parts use")
     identifiers = []
     if report.equipment_id.state == "known":
         identifiers.append(
@@ -237,8 +215,8 @@ def parse_report(content, source_texts, source_roles=None):
         for part in report.parts_used.items
     ]
     for field, value, ids in identifiers:
-        if not any(roles[source_id] == "observation" and value in source_texts[source_id] for source_id in ids):
+        if not any(value in source_texts[source_id] for source_id in ids):
             raise ValueError(
-                f"{field} must occur verbatim in a cited observation; a reference alone is insufficient"
+                f"{field} must occur verbatim in a cited source; do not append descriptions or normalize the identifier"
             )
     return data

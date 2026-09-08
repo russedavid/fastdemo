@@ -1,0 +1,56 @@
+{
+  "name": "frontline-pilot-v1",
+  "started_at": "2026-09-08T22:08:23.570995+00:00",
+  "scope": "Report-generation component only; no live audio, image, retrieval, or UI claims.",
+  "method": "Frozen single-variant development follow-up. All attempted outcomes retained. Historical development comparison; old outputs are reused, not contemporaneously rerun. Validation/display code changes are separately snapshotted.",
+  "provider": "groq",
+  "model": "qwen/qwen3.8-27b",
+  "status": "finished",
+  "interval_seconds": 65,
+  "planned_requests": 20,
+  "attempted": 20,
+  "completed": [
+    "FL-001-deployed",
+    "FL-002-deployed",
+    "FL-003-deployed",
+    "FL-004-deployed",
+    "FL-005-deployed",
+    "FL-006-deployed",
+    "FL-007-deployed",
+    "FL-008-deployed",
+    "FL-009-deployed",
+    "FL-010-deployed",
+    "FL-011-deployed",
+    "FL-012-deployed",
+    "FL-013-deployed",
+    "FL-014-deployed",
+    "FL-015-deployed",
+    "FL-016-deployed",
+    "FL-017-deployed",
+    "FL-018-deployed",
+    "FL-019-deployed",
+    "FL-020-deployed"
+  ],
+  "label_status": "Provisional AI-authored reference fields; no human semantic judgments yet.",
+  "selected_variant": "deployed",
+  "historical_comparison": {
+    "baseline_run": "20260908T160338Z-pilot",
+    "manifest_sha256": "bd7653b6de0505bd257b26f2201e8372b4936c944da639890915aa1f79498bac",
+    "changed_request_components": [
+      "system_instruction"
+    ],
+    "limitation": "Historical development comparison; old outputs are reused, not contemporaneously rerun. Validation/display code changes are separately snapshotted."
+  },
+  "continue_schema_errors": true,
+  "artifacts": {
+    "evals/corpus/pilot-v1.jsonl": "3efcbbeeac11726285a9573f0c8caaa6221a3fad6cd03ef90a0b5a3e09925ae9",
+    "evals/corpus/pilot-v1.manifest.json": "32b66a33510e72d0515afc8094fec85a07191655afc5996a8860a0f8f77dc9bc",
+    "evals/minimal-report-instructions.txt": "98b73d9cc9b4127f4f3060776a07b5e665bed4ea3163e7f7a96fe81c1e45ab49",
+    "report-instructions.txt": "bc60550b10025dfd2582a156def788e9357cd50ed463e872de18bd16ff1bbb8a",
+    "reporting.py": "b507b8bce55618a3c182dd62a1195e4272bc1e9745817b6dbc15c14b3b325ead",
+    "report_views.py": "6162deac009366c253a7a01cdc037df8af95c4ecc6bb2a5a01162154d6edbef5",
+    "groq_service.py": "c51a5750f640afc6935680bd359a561924953b9f5c530eb40abb7d0b637306d4",
+    "evals/pilot.py": "629a3273a762d65d187e7cd922ea08576f821828412f19932361dee38610b121"
+  },
+  "finished_at": "2026-09-08T22:28:59.989105+00:00"
+}

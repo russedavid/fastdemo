@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT))
 from evals.run_reports import source_items
 from evals.trace_data import provider_error
 from groq_service import BASE, MODEL, report_request
-from reporting import parse_report, source_roles_from_items, source_texts_from_items
+from reporting import parse_report, source_texts_from_items
 
 CORPUS = ROOT / "evals/corpus/pilot-v1.jsonl"
 MANIFEST = ROOT / "evals/corpus/pilot-v1.manifest.json"
@@ -184,7 +184,7 @@ async def call_requests(args, output, requests, manifest):
                     try:
                         if record["finish_reason"] != "stop":
                             raise ValueError("Truncated output")
-                        record["report"] = parse_report(record["raw_output"], source_texts_from_items(item["source_items"]), source_roles_from_items(item["source_items"]))
+                        record["report"] = parse_report(record["raw_output"], source_texts_from_items(item["source_items"]))
                         record["structural_status"] = "accepted"
                     except (ValueError, TypeError, KeyError, IndexError) as error:
                         record["structural_status"] = "rejected"

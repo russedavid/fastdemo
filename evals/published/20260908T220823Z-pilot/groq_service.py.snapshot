@@ -11,12 +11,7 @@ import httpx
 from PIL import Image
 
 from hosting_runtime import LimitReached
-from reporting import (
-    build_request,
-    parse_report,
-    source_roles_from_items,
-    source_texts_from_items,
-)
+from reporting import build_request, parse_report, source_texts_from_items
 
 MODEL = "qwen/qwen3.8-27b"
 BASE = "https://api.groq.com/openai/v1"
@@ -103,7 +98,7 @@ class GroqService:
             choice = data["choices"][0]
             if choice["finish_reason"] != "stop":
                 raise ValueError("Incomplete generation")
-            report = parse_report(choice["message"]["content"], source_texts_from_items(items), source_roles_from_items(items))
+            report = parse_report(choice["message"]["content"], source_texts_from_items(items))
         except (ValueError, TypeError, KeyError, IndexError) as error:
             raise ProviderUnavailable("The generated report did not pass validation. Your inputs are saved; please try again.") from error
         return report, {"model": data.get("model", MODEL), "usage": data.get("usage", {})}

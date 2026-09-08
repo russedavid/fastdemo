@@ -1,0 +1,10 @@
+{
+  "run_id": "20260908T220823Z-pilot",
+  "reviewer_kind": "assistant",
+  "reviewed_traces": 20,
+  "human_reviewed_traces": 0,
+  "criteria_version": "assistant-v1",
+  "source_notes_sha256": "fd3dd9005294b6b5c78235d7005e7d977009665e5f9ca7f64eab984d8ba2c305",
+  "review_file_sha256": "56d8133c41fa2ea427f3bf77cdf3dd01386526963ec29c27bfb583495b68c08e",
+  "scope": "Same generated-field criteria as the original review. The UI wording mitigation is considered separately. All cases remain development data."
+}

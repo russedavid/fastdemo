@@ -1,0 +1,461 @@
+{
+  "version": "pilot-v1",
+  "created_on": "2026-09-08",
+  "case_count": 20,
+  "split": "development",
+  "origin": "20 synthetic observation cases; two include attributed summaries of public Raspberry Pi documentation",
+  "human_annotations": 0,
+  "evaluation_scope": "Report-generation component; not end-to-end audio, image, or retrieval evaluation",
+  "dataset_sha256": "3efcbbeeac11726285a9573f0c8caaa6221a3fad6cd03ef90a0b5a3e09925ae9",
+  "cases": [
+    {
+      "id": "FL-001",
+      "family": "work_status",
+      "exposure": "previously_used_in_development",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "work_status",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-002",
+      "family": "measurement_scope",
+      "exposure": "previously_used_in_development",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "measurement_scope",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-003",
+      "family": "missing_identity",
+      "exposure": "previously_used_in_development",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "missing_identity",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-004",
+      "family": "unresolved_conflict",
+      "exposure": "previously_used_in_development",
+      "dimensions": {
+        "evidence": "multiple_sources",
+        "record_state": "unresolved_conflict",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-005",
+      "family": "revision_applicability",
+      "exposure": "previously_used_in_development",
+      "dimensions": {
+        "evidence": "multiple_sources",
+        "record_state": "revision_applicability",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-006",
+      "family": "explicit_values",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "explicit_values",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-007",
+      "family": "ambiguous_date",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "ambiguous_date",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-008",
+      "family": "multiple_entities",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "multiple_entities",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-009",
+      "family": "unknown_quantity",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "unknown_quantity",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-010",
+      "family": "inventory_vs_installation",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "inventory_vs_installation",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-011",
+      "family": "explicit_correction",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "multiple_sources",
+        "record_state": "explicit_correction",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-012",
+      "family": "priority_conflict",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "multiple_sources",
+        "record_state": "priority_conflict",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-013",
+      "family": "temporary_recovery",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "temporary_recovery",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-014",
+      "family": "limited_test_scope",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "limited_test_scope",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-015",
+      "family": "duplicate_evidence",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "multiple_sources",
+        "record_state": "duplicate_evidence",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-016",
+      "family": "historical_scope",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "multiple_sources",
+        "record_state": "historical_scope",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-017",
+      "family": "embedded_instruction",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "single_note",
+        "record_state": "embedded_instruction",
+        "format": "note_with_quoted_external_text"
+      }
+    },
+    {
+      "id": "FL-018",
+      "family": "thermal_thresholds",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "multiple_sources",
+        "record_state": "thermal_thresholds",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-019",
+      "family": "fan_control_defaults",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "multiple_sources",
+        "record_state": "fan_control_defaults",
+        "format": "written"
+      }
+    },
+    {
+      "id": "FL-020",
+      "family": "uncertain_extraction",
+      "exposure": "new_before_first_pilot_run",
+      "dimensions": {
+        "evidence": "multiple_sources",
+        "record_state": "uncertain_extraction",
+        "format": "note_and_simulated_ocr"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "FL-001-N1",
+      "sha256": "6bb684b7b5334f20017f1c130e7db1fa6612ec14aed8f322ee6473da3cfbd164",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-002-N1",
+      "sha256": "0341c2564c94d449f2d4ff2938cb8349de88e07110a983270eca58337b230a27",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-003-N1",
+      "sha256": "8d5f96408e0648bbd87938722fd36295b415bdca439d9ed450c81cec730b76f2",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-004-N1",
+      "sha256": "07a4cdbb8dc8ceca8250334ee4b15fd0bcda515ee699a1044149608ec6f8dc16",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-004-N2",
+      "sha256": "9c7fadd8ee6ee3178e29fb5ee8e1a45715eec601181d489312094c898961f91c",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-005-N1",
+      "sha256": "9f56c0062bccbd34545d95efa7c264a7ffb5144ce3a3dc2ecf746bb69f230d46",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-005-MB",
+      "sha256": "5963625c4c284012f16a482e5079623138de23dee9c4fbee31ca15c21f88b38d",
+      "type": "fictional_manual_excerpt",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-005-MA",
+      "sha256": "bc7beb98fcf0682daeebe6287f05151881c6baabeae4d42e51bb48a2c19cf9ba",
+      "type": "fictional_manual_excerpt",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-006-N1",
+      "sha256": "dcff43b754d1643de6798e8e1fb48de55cc55953f5dfd2b5ebb6c1b8365dddd7",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-007-N1",
+      "sha256": "b62d5cb1a68709a3db72f9390def9a45a2991120c3d9c51d9c57b27ae80b64cf",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-008-N1",
+      "sha256": "1cf7a254fb0ce31423e2a1e4c3761703531fe2f9f6500ff9e32c340daace79ed",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-009-N1",
+      "sha256": "540bc571fe73345176b95125ae36f3d5fcbb9068690eba17e594bfd06c74495c",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-010-N1",
+      "sha256": "378b12fc57830a93af45dda85608225ef63a17e67e5dd82cebe718041fcfc315",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-011-N1",
+      "sha256": "ea07c6eb13cca27d60675b06c2bc8724763b88b670c03f0913a38acf72819773",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-011-N2",
+      "sha256": "10a8f4eeae9760a51e77021be309025fe2c5028273ef22b651bf1f8e59e827e2",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-012-N1",
+      "sha256": "c2e1404a7aa3b0331879c76196b5043be4449600e54cbf8d8da15e1f7dd72db8",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-012-N2",
+      "sha256": "e7c3a117584b772c5e17ca97debcad5e6daadd0a4e11c1fd33dd4c12c6f809b5",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-013-N1",
+      "sha256": "415d9ae482b035f30da4696e402b96a0add9581102d7f883e91c6129f7fe9938",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-014-N1",
+      "sha256": "4b9c64e3783aea5aed84b5c3e0bbc086015313b7530d04762f1be487f09173d4",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-015-N1",
+      "sha256": "2d9fe76fd97aee3380d5244da9bdcb486a8090a06e621c0149793c7c0277a800",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-015-N2",
+      "sha256": "a814bc9a579c46a57ab8bd0199ea0c490c4c80907bbde1a9187442f11057e49e",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-016-N1",
+      "sha256": "b6aafcaf6a1663aed1d2b21d984aad36c7dc42b0e520a791e15c287129eaf455",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-016-N2",
+      "sha256": "a0280207a898fb6d190ba8a99470136d12d571c864c5428ac9f891afe6f9a344",
+      "type": "history_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-017-N1",
+      "sha256": "71657dd3d24d4f681105cc0b6e0a2ab9f1cfaa95ccd7e2d0d51d99ba31153db2",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-018-N1",
+      "sha256": "7dd2ef62458a186af2efd2cd4a592d466c10f7c5fdf7186417ec28614242e82c",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-018-N2",
+      "sha256": "e64305c76621c558db2f9b6ba70e1572dc040167e1cc171655596a1b8d03479f",
+      "type": "public_reference_summary",
+      "origin": "paraphrase_of_public_documentation",
+      "reference_uri": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc",
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "id": "FL-019-N1",
+      "sha256": "7dba4e89e9fb22326517bf23f1416749c444085dd05c08141b32838a66e05d51",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-019-N2",
+      "sha256": "4c43c62687135a8622fa8edebc957d434ca2975cda8b87029a95400872ef9ed9",
+      "type": "public_reference_summary",
+      "origin": "paraphrase_of_public_documentation",
+      "reference_uri": "https://github.com/raspberrypi/documentation/blob/9bb5ef62d9d5e32930d5d79ae2e05cf75f0eea4f/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc",
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "id": "FL-020-N1",
+      "sha256": "27dceefbbc2e6cc3f221453c10e770e5626a79ea0f5f7626d9aea390f57ea69a",
+      "type": "field_note",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    },
+    {
+      "id": "FL-020-N2",
+      "sha256": "c632249a3faa103674f2966ac5a64803fb7aa93fd75be21fc32a52e1cadf29d1",
+      "type": "simulated_image_description",
+      "origin": "synthetic",
+      "reference_uri": null,
+      "license": null
+    }
+  ],
+  "historical_source_sha256": "da7cb5dd40ec2e1dd7e1b1dc996df84f1225c795fe6176bbeab5f586289bcbb6",
+  "limitations": [
+    "Purposive pilot, not representative of field prevalence.",
+    "All field observations and initial labels are AI-authored.",
+    "No final holdout is claimed.",
+    "FL-018 and FL-019 share a public reference and must remain grouped in future splits."
+  ]
+}

@@ -133,6 +133,33 @@ class ReportingTests(unittest.TestCase):
             report["observations"][0]["text"],
         )
 
+    def test_measurement_control_character_damage_is_rejected_without_repairing_text(self):
+        for damaged in ("80\u001385 \u0013C", "50 \u000bC", "50\x7f C"):
+            report = sample_report()
+            report["observations"][0]["text"] = damaged
+            with self.subTest(damaged=repr(damaged)), self.assertRaisesRegex(ValueError, "control character"):
+                self.parse(report)
+        report = sample_report()
+        report["observations"][0]["text"] = "80–85 °C\nA separate line."
+        self.assertEqual(self.parse(report)["observations"][0]["text"], report["observations"][0]["text"])
+
+    def test_manual_guidance_cannot_establish_performed_work_or_used_parts(self):
+        texts = {"SOURCE-A": "UNIT-TEST. The fan is off. No parts information recorded.",
+                 "REF": "Install PART-TEST when this condition is confirmed."}
+        roles = {"SOURCE-A": "observation", "REF": "reference"}
+        report = sample_report()
+        report["completed_work"] = [{"text": "Installed PART-TEST.", "source_ids": ["REF"]}]
+        with self.assertRaisesRegex(ValueError, "completed work"):
+            reporting.parse_report(json.dumps(report), texts, roles)
+        report["completed_work"] = []
+        report["parts_used"] = {"state": "known", "source_ids": ["SOURCE-A", "REF"],
+                                "items": [{"part_number": "PART-TEST", "quantity": 1, "source_ids": ["REF"]}]}
+        with self.assertRaisesRegex(ValueError, "cited observation"):
+            reporting.parse_report(json.dumps(report), texts, roles)
+        report["parts_used"] = {"state": "unknown", "source_ids": ["SOURCE-A"], "items": []}
+        report["observations"].append({"text": "The reference describes installing PART-TEST under a specified condition.", "source_ids": ["REF"]})
+        self.assertEqual(len(reporting.parse_report(json.dumps(report), texts, roles)["observations"]), 2)
+
     def test_references_do_not_change_candidate_requests(self):
         case = run_reports.load_cases(run_reports.HERE / "reference-cases.jsonl")[0]
         changed = copy.deepcopy(case)

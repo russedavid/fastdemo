@@ -28,12 +28,14 @@ def export_run(source, destination):
     for name in names:
         shutil.copyfile(source / name, destination / name)
     (destination / "README.md").write_text(
-        "Frontline paired report pilot\n"
-        "============================\n\n"
+        "Frontline recorded report evaluation\n"
+        "====================================\n\n"
         "This bundle preserves all " + str(manifest["planned_requests"]) +
         " recorded requests, including structural failures. It contains synthetic source observations "
-        "and generated outputs, not production user records. Human review journals are not included.\n\n"
-        "The two variants differ only in the system instruction. Model requests, source data, "
+        "and generated outputs, not production user records. Human review journals are not included.\n\n" +
+        ("The two variants differ only in the system instruction. " if manifest.get("selected_variant", "both") == "both"
+         else "This run captures one instruction variant; any historical comparison is described in the manifest. ") +
+        "Model requests, source data, "
         "settings, and code snapshots are retained. The initial reference labels are AI-authored "
         "and provisional. This is development data, not a held-out quality benchmark.\n\n"
         "Use the local review tool and evaluation method in the repository to inspect the traces. "
